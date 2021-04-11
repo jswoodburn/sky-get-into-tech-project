@@ -3,10 +3,10 @@ class User:
     # all this info needs to be saved off to SQL
 
     numCreated = 0
-    mindful_minutes = 0
-    journal_words = 0
 
     def __init__(self, email, password):
+        self.mindful_minutes = 0
+        self.journal_words = 0
         self._email = email  # add a try/except for valid email (or have this in JS)
         self._password = password  # maybe add password rules (try/except or JS)
         User.numCreated += 1
@@ -47,7 +47,7 @@ class User:
         return self.mindful_minutes
 
     @mindfulness.setter
-    def mindfulness(self,minutes):
+    def mindfulness(self, minutes):
         self.mindful_minutes += minutes
 
     @property

@@ -35,10 +35,10 @@ class JournalEntry:
     # if someone just wants to edit one word of a blog, need to return their old content to them, and then have it be
     # returned as new content -- use properties.
 
-    @property
-    def view_count(self):
-        return self.page_views
-
-    @view_count.setter
-    def view_count(self):
-        self.page_views += 1
+    # @property
+    # def view_count(self):
+    #     return self.page_views
+    #
+    # @view_count.setter
+    # def view_count(self):
+    #     self.page_views += 1
