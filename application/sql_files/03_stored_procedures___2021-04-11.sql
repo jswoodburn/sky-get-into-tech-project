@@ -10,7 +10,7 @@ values (id, CURDATE(), CURRENT_TIME(), journal_title, journal_content);
 end //
 delimiter ;
 
-call createJournalEntry(1, 'Testing Procedure 2', 'A temporary journal to test stored procedures');
+-- call createJournalEntry(1, 'Testing Procedure 2', 'A temporary journal to test stored procedures');
 
 drop procedure if exists editJournalEntry;
 delimiter //
@@ -22,4 +22,20 @@ where journal_id = id;
 end //
 delimiter ;
 
-call editJournalEntry(8, 'A temporary journal to test stored procedures, that has now been edited.');
+-- call editJournalEntry(8, 'A temporary journal to test stored procedures, that has now been edited.');
+
+-- -- this doesn't work because content and title cannot be null - what is best practice?
+-- drop procedure if exists deleteJournalEntry;
+-- delimiter //
+-- create procedure deleteJournalEntry
+-- (in id int)
+-- begin
+-- update journal_entry set content = null
+-- where journal_id = id;
+-- update journal_entry set title = null
+-- where journal_id = id;
+-- end // 
+-- delimiter ;
+
+-- call deleteJournalEntry(7);
+

@@ -93,6 +93,7 @@ create table external_article (
 url varchar(600) not null primary key,
 date_added date not null,
 time_added time not null,
+article_title varchar(500) not null,
 article_author int,
 publication int,
 tag_1 int,
