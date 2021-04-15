@@ -23,6 +23,8 @@ def journal():
             error = "Please supply a title and entry"
         else:
             #take user to personal journal page with all their published journal sorted by date posted
+            db.session.add(journalentry)
+            db.session.commit()
             return "Thank you"
 
     return render_template('journal.html', form=form, message=error)
