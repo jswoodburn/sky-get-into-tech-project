@@ -1,0 +1,4 @@
+flask_wtf
+WTForms~=2.3.3
+Flask~=1.1.2
+MarkupSafe~=1.1.1
