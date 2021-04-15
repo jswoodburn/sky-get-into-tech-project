@@ -8,6 +8,11 @@ from application import app
 def home():
     return render_template('homepage.html', title='Home')
 
+
+@app.route('/journal')
+def journal():
+    return render_template('journal.html', title='Journal')
+
 # @app.route('/mindfulness'):
 # def mindful():
 #     return render_template(mindful.html, title='Mindfulness')
