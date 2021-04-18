@@ -1,8 +1,9 @@
-from flask import render_template, request
+from flask import Flask, render_template, request
 from application import app, db
 from application.forms.journalform import JournalForm
 from application.models import User, Journal
 from datetime import datetime
+from flask_sqlalchemy import SQLAlchemy
 
 
 @app.route('/')
