@@ -24,7 +24,7 @@ class Journal(db.Model):
     journal_id = db.Column('journal_id', db.Integer, primary_key=True, nullable=False)
     date = db.Column('date_created', db.Date, nullable=False)
     time = db.Column('time_created', db.Time, nullable=False)
-    author_id = db.Column('author_id', db.Integer, ForeignKey('User.user_id'), nullable=False)
+    author_id = db.Column('author_id', db.Integer, db.ForeignKey('User.user_id'), nullable=False)
     entry = db.Column('journal_entry', db.String(3000), nullable=False)
     title = db.Column('journal_title', db.String(200), nullable=False)
     archived = db.Column('is_journal_archived', db.Boolean)
