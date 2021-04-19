@@ -9,3 +9,7 @@ oauthlib
 pyOpenSSL
 Flask-Login
 pymysql
+authlib
+google-api-python-client
+google-auth
+virtualenv

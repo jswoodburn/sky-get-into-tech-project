@@ -3,35 +3,38 @@ import json
 import os
 # Third-party libraries
 from flask import Flask, redirect, request, url_for
-from flask_login import (
-    LoginManager,
-    current_user,
-    login_required,
-    login_user,
-    logout_user,
-)
-from oauthlib.oauth2 import WebApplicationClient
-import requests
+import functools
+import json
+import os
 
-# Google Config
-GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", None)
-GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET", None)
-GOOGLE_DISCOVERY_URL = (
-    "https://accounts.google.com/.well-known/openid-configuration")
+import flask
+
+# from authlib.client import OAuth2Session
+# import google.oauth2.credentials
+# import googleapiclient.discovery
+
+# from application.login import google_auth
+
+app = flask.Flask(__name__)
+app.secret_key = os.environ.get("FN_FLASK_SECRET_KEY", default=False)
+
+# app.register_blueprint(google_auth.app)
 
 
-def get_google_provider_cfg():
-    return requests.get(GOOGLE_DISCOVERY_URL).json()
+@app.route('/')
+def index():
+    if google_auth.is_logged_in():
+        user_info = google_auth.get_user_info()
+        return '<div>You are currently logged in as ' + user_info['given_name'] + '<div><pre>' + json.dumps(user_info,
+                                                                                                            indent=4) + "</pre>"
+
+    return 'You are not currently logged in.'
 
 
 app.config['SECRET_KEY'] = 'skygit'
+app = Flask(__name__)
 
 if __name__ == "__main__":
     app.run(debug=True)
 
-# add Db
-app.config['SQLALCHEMY_DATABASE_URI'] = \
-    'mysql+pymysql://root:testpass@localhost/digitalhealth/'
-
-# Initialise db
 db = SQLAlchemy(app)
