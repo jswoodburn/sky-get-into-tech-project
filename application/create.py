@@ -1,8 +1,6 @@
-# EVERYONE RUN THIS TO GET DBS SYNCED UP
-
 from application import db
-from application.models import Journal, User
-
+from models import Journal, User
+# EVERYONE RUN THIS TO GET DBS SYNCED UP
 db.drop_all()
 db.create_all()
 
