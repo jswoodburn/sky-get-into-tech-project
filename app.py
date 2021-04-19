@@ -12,7 +12,8 @@ from flask_login import (
 )
 from oauthlib.oauth2 import WebApplicationClient
 import requests
-#Google Config
+
+# Google Config
 GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", None)
 GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET", None)
 GOOGLE_DISCOVERY_URL = (
@@ -27,3 +28,10 @@ app.config['SECRET_KEY'] = 'skygit'
 
 if __name__ == "__main__":
     app.run(debug=True)
+
+# add Db
+app.config['SQLALCHEMY_DATABASE_URI'] = \
+    'mysql+pymysql://root:testpass@localhost/digitalhealth/'
+
+# Initialise db
+db = SQLAlchemy(app)
