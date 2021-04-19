@@ -1,9 +1,8 @@
-from flask import app
+from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.sql import text
 from os import getenv
 
-application = app
+app = Flask(__name__)
 
 
 username = 'newuser'

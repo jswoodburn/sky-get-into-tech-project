@@ -1,8 +1,9 @@
-from flask import Flask, render_template, request
+from flask import render_template, request
 from application import app, db
 from application.forms.journalform import JournalForm
-from application.models import User, Journal
+from application.models import Journal
 from datetime import datetime
+
 from login import google_auth
 
 
@@ -14,6 +15,7 @@ def index():
                                                                                                             indent=4) + "</pre>"
 
     return 'You are not currently logged in.'
+
 
 @app.route('/home')
 def home():
@@ -40,7 +42,6 @@ def journal():
             return "Thank you"
 
     return render_template('journal.html', form=form, message=error)
-
 
 # @app.route('/favourites')
 # def favourites():
