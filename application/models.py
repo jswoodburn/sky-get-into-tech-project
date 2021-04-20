@@ -1,7 +1,6 @@
 from application import db
 from datetime import datetime
 
-
 class User(db.Model):
     __table_args__ = {'extend_existing': True}
     user_id = db.Column('user_id', db.Integer, primary_key=True, nullable=False)
