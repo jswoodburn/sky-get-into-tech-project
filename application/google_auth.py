@@ -6,7 +6,7 @@ import flask
 from authlib.client import OAuth2Session
 import google.oauth2.credentials
 import googleapiclient.discovery
-
+import GoogleSignInClient
 ACCESS_TOKEN_URI = 'https://www.googleapis.com/oauth2/v4/token'
 AUTHORIZATION_URL = 'https://accounts.google.com/o/oauth2/v2/auth?access_type=offline&prompt=consent'
 
@@ -70,7 +70,8 @@ def login():
                             scope=AUTHORIZATION_SCOPE,
                             redirect_uri=AUTH_REDIRECT_URI)
 
-    uri, state = session.authorization_url(AUTHORIZATION_URL)
+    # uri, state = session.authorization_url(AUTHORIZATION_URL)
+    uri, state = session.create_authorization_url(AUTHORIZATION_URL)
 
     flask.session[AUTH_STATE_KEY] = state
     flask.session.permanent = True
