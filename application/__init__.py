@@ -5,8 +5,6 @@ from os import getenv
 
 app = Flask(__name__)
 
-application = app
-
 # make sure the username, password and database name are correct
 username = 'newuser'
 password = 'password'
@@ -29,17 +27,18 @@ app.config['SECRET_KEY'] = getenv('FLASK_SECRETKEY')
 # Linking app to the persistance layer
 
 db = SQLAlchemy(app)
-@app.route('/')
-def testdb():
-    try:
-        db.session.query(text('1')).from_statement(text('SELECT 1')).all()
-        return '<h1>It works.</h1>'
-    except Exception as e:
-        # see Terminal for description of the error
-        print("\nThe error:\n" + str(e) + "\n")
-        return '<h1>Something is broken.</h1>'
 
-
-if __name__ == '__main__':
-    app.run(debug=True)
+# @app.route('/')
+# def testdb():
+#     try:
+#         db.session.query(text('1')).from_statement(text('SELECT 1')).all()
+#         return '<h1>It works.</h1>'
+#     except Exception as e:
+#         # see Terminal for description of the error
+#         print("\nThe error:\n" + str(e) + "\n")
+#         return '<h1>Something is broken.</h1>'
+#
+#
+# if __name__ == '__main__':
+#     app.run(debug=True)
 
