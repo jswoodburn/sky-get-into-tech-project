@@ -7,8 +7,8 @@ db.drop_all()
 db.create_all()
 
 # input sample data here
-test_user_1 = User(email='jackie.woodburn@gmail.com',
-                   first_name='Jackie', last_name='Woodburn')
+# test_user_1 = User(email='jackie.woodburn@gmail.com',
+#                    first_name='Jackie', last_name='Woodburn')
 
 # add and commit sample data to db here
 db.session.add(test_user_1)
@@ -22,3 +22,4 @@ test_journal_1 = Journal(date=datetime.now().date(), time=datetime.now().time(),
 # add and commit sample data to db here
 db.session.add(test_journal_1)
 db.session.commit()
+

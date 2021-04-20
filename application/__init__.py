@@ -1,33 +1,28 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.sql import text
 from os import getenv
+from application import routes
 
 app = Flask(__name__)
 
 # make sure the username, password and database name are correct
+
 username = 'newuser'
 password = 'password'
 userpass = 'mysql+pymysql://' + username + ':' + password + '@'
-# keep this as is for a hosted website
 server = '127.0.0.1'
-# change to YOUR database name, with a slash added as shown
-dbname  = '/db'
-# no socket
-
-
-# change NOTHING below
+dbname = '/db'
 
 # put them all together as a string that shows SQLAlchemy where the database is
 app.config['SQLALCHEMY_DATABASE_URI'] = userpass + server + dbname
 # app.config['SQLALCHEMY_DATABASE_URI'] = "mysql+pymysql://newuser:password@localhost/db"
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
-app.config['SECRET_KEY'] = getenv('FLASK_SECRETKEY')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+# app.config['SECRET_KEY'] = getenv('FLASK_SECRETKEY')
 
-# Linking app to the persistance layer
-
+# Linking app to the persistence layer
 db = SQLAlchemy(app)
 
+# uncomment and run below code to check connection
 # @app.route('/')
 # def testdb():
 #     try:
@@ -41,4 +36,3 @@ db = SQLAlchemy(app)
 #
 # if __name__ == '__main__':
 #     app.run(debug=True)
-

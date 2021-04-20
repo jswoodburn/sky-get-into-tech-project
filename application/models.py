@@ -1,9 +1,10 @@
-from application import db
+from application.create import db
 
 from datetime import datetime
 
 
 class User(db.Model):
+    __table_args__ = {'extend_existing': True}
     user_id = db.Column('user_id', db.Integer, primary_key=True, nullable=False)
     email = db.Column('email', db.String(100), nullable=False, unique=True)
     first_name = db.Column('first_name', db.String(50), nullable=False)
@@ -20,6 +21,7 @@ class User(db.Model):
 
 
 class Journal(db.Model):
+    __table_args__ = {'extend_existing': True}
     journal_id = db.Column('journal_id', db.Integer, primary_key=True, nullable=False)
     date = db.Column('date_created', db.Date, nullable=False, default=datetime.utcnow())
     time = db.Column('time_created', db.Time, nullable=False, default=datetime.utcnow())
