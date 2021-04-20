@@ -1,22 +1,11 @@
-import json
 from flask import render_template, request
-from flask_login import login_required
-from application import app, google_auth
+from application import app, db
 from application.forms.journalform import JournalForm
-from application.models import *
+from application.models import User, Journal
 from datetime import datetime
 
 
 @app.route('/')
-def index():
-    if google_auth.is_logged_in():
-        user_info = google_auth.get_user_info()
-        return '<div>You are currently logged in as ' + user_info['given_name'] + '<div><pre>' + json.dumps(user_info,
-                                                                                                            indent=4) + "</pre>"
-
-    return 'You are not currently logged in.'
-
-
 @app.route('/home')
 def home():
     return render_template('homepage.html', title='Home')
@@ -42,18 +31,3 @@ def journal():
             return "Thank you"
 
     return render_template('journal.html', form=form, message=error)
-
-
-@app.route('/profile')
-@login_required
-def profile():
-    return render_template('profile.html')
-
-# @app.route('/favourites')
-# def favourites():
-#     faves = ['books', 'food', 'puppies']
-#     return render_template('favourites.html', title='Journal', list=faves)
-
-# @app.route('/mindfulness'):
-# def mindful():
-#     return render_template(mindful.html, title='Mindfulness')

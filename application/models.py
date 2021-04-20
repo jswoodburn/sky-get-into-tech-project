@@ -1,5 +1,4 @@
-from application.create import db
-
+from application import db
 from datetime import datetime
 
 
