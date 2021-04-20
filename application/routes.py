@@ -1,10 +1,9 @@
 from flask import render_template, request
-from application import app, db
+from flask_login import login_required
+from application import app, db, google_auth
 from application.forms.journalform import JournalForm
 from application.models import Journal
 from datetime import datetime
-
-from login import google_auth
 
 
 @app.route('/')
@@ -42,6 +41,12 @@ def journal():
             return "Thank you"
 
     return render_template('journal.html', form=form, message=error)
+
+
+@app.route('/profile')
+@login_required
+def profile():
+    return render_template('profile.html')
 
 # @app.route('/favourites')
 # def favourites():
