@@ -43,11 +43,17 @@ def specific_journal_page(user_id, journal_id):
     return render_template('journal_entry.html', title=journal.title, entry=journal.entry, date=journal.date,
                            time=time, author=f"{author.first_name} {author.last_name}")
 
-# @app.route('/journal/<user_id>')
-# def user_journal_list(user_id):
-#     user_journal_titles = db.select([Journal.title]).where(Journal.author_id == 1).order_by(db.desc(Journal.date)).\
-#         order_by(db.desc(Journal.time))
-#     return render_template('user_journals_list.html', title="Your Journal Entries", title_list = user_journal_titles)
+@app.route('/journal/<user_id>')
+def user_journal_list(user_id):
+    author_entries = db.session.query(Journal.journal_id).filter_by(author_id=1).order_by(Journal.date).order_by(
+        Journal.time)
+    titles_and_ids = []
+    for id in author_entries:
+        journal_id = id[0]
+        entry = db.session.query(Journal).get(journal_id)
+        url = url_for('specific_journal_page', user_id=user_id, journal_id=journal_id)
+        titles_and_ids.append([entry.title, url])
+    return render_template('user_journals_list.html', title="Your Journal Entries", title_list=titles_and_ids)
 
 
 # journal_1 = db.session.query(Journal).get(1)
