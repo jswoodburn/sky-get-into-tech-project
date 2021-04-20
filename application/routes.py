@@ -56,6 +56,8 @@ def user_journal_list(user_id):
     return render_template('user_journals_list.html', title="Your Journal Entries", title_list=titles_and_ids)
 
 
+
+# ------- FOR REFERENCE - DELETE ON MERGE ------- SQL ALCHEMY QUERIES AND UPDATES -------- #
 # journal_1 = db.session.query(Journal).get(1)
 # journal_1.date = '2000-02-01'
 # author_1_entries = db.session.query(Journal.title).filter_by(author_id=1).order_by(Journal.date).order_by(Journal.time)
