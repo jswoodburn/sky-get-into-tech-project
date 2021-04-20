@@ -1,8 +1,9 @@
+import json
 from flask import render_template, request
 from flask_login import login_required
-from application import app, db, google_auth
+from application import app, google_auth
 from application.forms.journalform import JournalForm
-from application.models import Journal
+from application.models import *
 from datetime import datetime
 
 
