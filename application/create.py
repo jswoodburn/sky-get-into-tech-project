@@ -17,8 +17,15 @@ db.session.commit()
 # input sample data here
 test_journal_1 = Journal(date=datetime.now().date(), time=datetime.now().time(), author_id=1, entry="This is a test "
                                                                                                     "entry.",
-                         title="Test Entry")
+                         title="Test Entry", deleted=False)
+test_journal_2 = Journal(date=datetime.now().date(), time=datetime.now().time(), author_id=1, entry="This is a test "
+                                                                                                    "entry. It should "
+                                                                                                    "register as "
+                                                                                                    "deleted",
+                         title="Test Entry 2 - deleted", deleted=True)
+
 
 # add and commit sample data to db here
 db.session.add(test_journal_1)
+db.session.add(test_journal_2)
 db.session.commit()

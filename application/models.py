@@ -26,7 +26,7 @@ class Journal(db.Model):
     author_id = db.Column('author_id', db.Integer, db.ForeignKey(User.user_id), nullable=False)
     entry = db.Column('journal_entry', db.String(3000), nullable=False)
     title = db.Column('journal_title', db.String(200), nullable=False)
-    archived = db.Column('is_journal_archived', db.Boolean)
+    deleted = db.Column('deleted', db.Boolean, nullable=False)
 
     #create a string to return model
     # def __repr__(self):
