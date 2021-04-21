@@ -13,7 +13,7 @@ def home():
 
 
 @app.route('/journal', methods=['GET', 'POST'])
-def journal():
+def create_journal():
     error = ""
     form = JournalForm()
 
@@ -33,6 +33,8 @@ def journal():
             return redirect(url_for('specific_journal_page', user_id=author, journal_id=journal_id))
 
     return render_template('create_journal_entry.html', form=form, message=error)
+    # return render_template('journalv2.html', form=form, message=error)
+
 
 @app.route('/journal/<user_id>')
 # need to add filter_by(deleted==False) or something so that don't get stuff that's been deleted
@@ -46,6 +48,7 @@ def user_journal_list(user_id):
         titles_and_ids.append([entry.title, url])
     return render_template('user_journals_list.html', title="Your Journal Entries", title_list=titles_and_ids)
 
+
 @app.route('/journal/<user_id>/<journal_id>')
 def specific_journal_page(user_id, journal_id):
     journal = db.session.query(Journal).get(journal_id)
@@ -56,6 +59,7 @@ def specific_journal_page(user_id, journal_id):
     else:
         return render_template('journal_entry.html', title=journal.title, entry=journal.entry, date=journal.date,
                            time=time, author=f"{author.first_name} {author.last_name}")
+
 
 @app.route('/journal/<user_id>/<journal_id>/edit', methods=["GET", "POST"])
 def edit_journal(user_id, journal_id):
@@ -88,6 +92,8 @@ def edit_journal(user_id, journal_id):
     form.title.data = journal_to_edit.title
     form.entry.data = journal_to_edit.entry
     return render_template('create_journal_entry.html', form=form, message=error)
+    # return render_template('journalv2.html', form=form, message=error)
+
 
 # ------- FOR REFERENCE - DELETE ON MERGE ------- SQL ALCHEMY QUERIES AND UPDATES -------- #
 # journal_1 = db.session.query(Journal).get(1)
