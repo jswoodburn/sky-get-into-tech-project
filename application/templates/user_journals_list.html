@@ -1,10 +1,9 @@
-{% extends "layout.html" %}
-{% block body_content %}
-    <ul>
-        {% for item in title_list %}
-        <li>
-            <a href={{item[1]}}>{{item[0]}}</a>
-        </li>
-        {% endfor %}
-    </ul>
+{% extends "layout.html" %} {% block body_content %}
+<ul>
+  {% for item in title_list %}
+  <li>
+    <a href="{{item[1]}}">{{item[0]}}</a>
+  </li>
+  {% endfor %}
+</ul>
 {% endblock %}
