@@ -1,5 +1,13 @@
 {% extends "layout.html" %}
 {% block body_content %}
+{% for journal in query %}
+<tr>
+  <td>
+    {{patient_id.lname}}
+  </td>
+...
+</tr>
+{% endfor %}
 <div class='entry-form'>
         <form action='' method='POST'>
             {{ form.hidden_tag() }}
