@@ -2,7 +2,7 @@ from flask import render_template, request, url_for
 from flask_login import current_user
 from google.auth.transport import requests
 
-from __init__ import get_google_provider_cfg, client, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, login_manager
+from application.__init__ import get_google_provider_cfg, client, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, login_manager
 from werkzeug.utils import redirect
 from application import app, db
 from application.forms.journalform import JournalForm
@@ -10,12 +10,15 @@ from application.models import User, Journal
 from datetime import datetime
 
 
-
 # Flask-Login helper to retrieve a user from our db
 @login_manager.user_loader
 def load_user(user_id):
     user = db.session.query(User).get(user_id)
     return user
+
+
+# ----------- ROUTES -----------------
+
 
 @app.route('/')
 @app.route('/home')
@@ -106,19 +109,6 @@ def callback():
     return redirect(url_for("index"))
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 @app.route('/journal', methods=['GET', 'POST'])
 def create_journal():
     error = ""
@@ -200,11 +190,3 @@ def edit_journal(user_id, journal_id):
     form.entry.data = journal_to_edit.entry
     return render_template('create_journal_entry.html', form=form, message=error)
     # return render_template('journalv2.html', form=form, message=error)
-
-# ------- FOR REFERENCE - DELETE ON MERGE ------- SQL ALCHEMY QUERIES AND UPDATES -------- #
-# journal_1 = db.session.query(Journal).get(1)
-# journal_1.date = '2000-02-01'
-# author_1_entries = db.session.query(Journal.title).filter_by(author_id=1).order_by(Journal.date).order_by(Journal.time)
-# print(author_1_entries[:])
-# db.session.add(journal_1)
-# db.session.commit()

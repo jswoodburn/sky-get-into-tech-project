@@ -1,14 +1,11 @@
-from flask import Flask
-from application.models import User
-from flask_sqlalchemy import SQLAlchemy
-from os import getenv
 # Python standard libraries
 import json
 import os
 import sqlite3
 
-# Third-party libraries
+# Third party libraries
 from flask import Flask, redirect, request, url_for
+from flask_sqlalchemy import SQLAlchemy
 from flask_login import (
     LoginManager,
     current_user,
@@ -18,6 +15,7 @@ from flask_login import (
 )
 from oauthlib.oauth2 import WebApplicationClient
 import requests
+
 
 # instantiate Flask object (app)
 app = Flask(__name__)
@@ -44,6 +42,13 @@ from application import routes
 
 app.secret_key = os.environ.get("SECRET_KEY") or os.urandom(24)
 
+
+# ----------- GOOGLE AUTH ---------------
+
+GOOGLE_CLIENT_ID = "1078137073918-2ur6jb9jsihmd95uohhp2hq6qkegnmoa.apps.googleusercontent.com"
+GOOGLE_CLIENT_SECRET = "yEGN03m9WSjLAGkK2azEvqof"
+GOOGLE_DISCOVERY_URL = "http://127.0.0.1:5000/google/auth"
+
 # User session management setup
 # https://flask-login.readthedocs.io/en/latest
 login_manager = LoginManager()
@@ -51,9 +56,6 @@ login_manager.init_app(app)
 
 # OAuth 2 client setup
 client = WebApplicationClient(GOOGLE_CLIENT_ID)
-
-
-
 
 
 def get_google_provider_cfg():
