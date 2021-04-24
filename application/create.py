@@ -24,10 +24,10 @@ test_journal_2 = Journal(date=datetime.now().date(), time=datetime.now().time(),
                                                                                                     "register as "
                                                                                                     "deleted",
                          title="Test Entry 2 - deleted", deleted=True)
-themes = JournalTheme(theme=['Reflection', 'Gratitude', 'Awareness of surroundings'])
+# themes = JournalTheme(theme=['Reflection', 'Gratitude', 'Awareness of surroundings'])
 
 # add and commit sample data to db here
-db.session.add(themes)
+# db.session.add(themes)
 db.session.add(test_journal_1)
 db.session.add(test_journal_2)
 db.session.commit()
