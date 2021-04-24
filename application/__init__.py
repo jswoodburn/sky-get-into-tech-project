@@ -1,5 +1,5 @@
 from flask import Flask
-from models import User
+from application.models import User
 from flask_sqlalchemy import SQLAlchemy
 from os import getenv
 # Python standard libraries
@@ -18,10 +18,6 @@ from flask_login import (
 )
 from oauthlib.oauth2 import WebApplicationClient
 import requests
-
-# Internal imports
-from db import init_db_command
-from user import User
 
 # instantiate Flask object (app)
 app = Flask(__name__)
@@ -57,11 +53,7 @@ login_manager.init_app(app)
 client = WebApplicationClient(GOOGLE_CLIENT_ID)
 
 
-# Flask-Login helper to retrieve a user from our db
-@login_manager.user_loader
-def load_user(user_id):
-    user = db.session.query(User).get(user_id)
-    return user
+
 
 
 def get_google_provider_cfg():

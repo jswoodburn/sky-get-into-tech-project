@@ -2,13 +2,20 @@ from flask import render_template, request, url_for
 from flask_login import current_user
 from google.auth.transport import requests
 
-from __init__ import get_google_provider_cfg, client, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET,
+from __init__ import get_google_provider_cfg, client, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, login_manager
 from werkzeug.utils import redirect
 from application import app, db
 from application.forms.journalform import JournalForm
 from application.models import User, Journal
 from datetime import datetime
 
+
+
+# Flask-Login helper to retrieve a user from our db
+@login_manager.user_loader
+def load_user(user_id):
+    user = db.session.query(User).get(user_id)
+    return user
 
 @app.route('/')
 @app.route('/home')
