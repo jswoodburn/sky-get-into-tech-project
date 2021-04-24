@@ -1,6 +1,27 @@
 from flask import Flask
+from models import User
 from flask_sqlalchemy import SQLAlchemy
 from os import getenv
+# Python standard libraries
+import json
+import os
+import sqlite3
+
+# Third-party libraries
+from flask import Flask, redirect, request, url_for
+from flask_login import (
+    LoginManager,
+    current_user,
+    login_required,
+    login_user,
+    logout_user,
+)
+from oauthlib.oauth2 import WebApplicationClient
+import requests
+
+# Internal imports
+from db import init_db_command
+from user import User
 
 # instantiate Flask object (app)
 app = Flask(__name__)
@@ -25,3 +46,19 @@ db = SQLAlchemy(app)
 
 from application import routes
 
+app.secret_key = os.environ.get("SECRET_KEY") or os.urandom(24)
+
+# User session management setup
+# https://flask-login.readthedocs.io/en/latest
+login_manager = LoginManager()
+login_manager.init_app(app)
+
+# OAuth 2 client setup
+client = WebApplicationClient(GOOGLE_CLIENT_ID)
+
+
+# Flask-Login helper to retrieve a user from our db
+@login_manager.user_loader
+def load_user(user_id):
+    user = db.session.query(User).get(user_id)
+    return user
