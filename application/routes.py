@@ -65,6 +65,52 @@ def callback():
     # Parse the tokens!
     client.parse_request_body_response(json.dumps(token_response.json()))
 
+    # Now that you have tokens (yay) let's find and hit the URL
+    # from Google that gives you the user's profile information,
+    # including their Google profile image and email
+    userinfo_endpoint = google_provider_cfg["userinfo_endpoint"]
+    uri, headers, body = client.add_token(userinfo_endpoint)
+    userinfo_response = requests.get(uri, headers=headers, data=body)
+
+    # You want to make sure their email is verified.
+    # The user authenticated with Google, authorized your
+    # app, and now you've verified their email through Google!
+    if userinfo_response.json().get("email_verified"):
+        unique_id = userinfo_response.json()["sub"]
+        users_email = userinfo_response.json()["email"]
+        picture = userinfo_response.json()["picture"]
+        users_name = userinfo_response.json()["given_name"]
+    else:
+        return "User email not available or not verified by Google.", 400
+
+    # Create a user in your db with the information provided
+    # by Google
+    names = users_name.split("")
+    user = User(user_id=unique_id, email=users_email, first_name=names[0], last_name=names[1])
+
+    # Doesn't exist? Add it to the database.
+    if not User.get(unique_id):
+        User.create(unique_id, users_name, users_email, picture)
+
+    # Begin user session by logging the user in
+    login_user(user)
+
+    # Send user back to homepage
+    return redirect(url_for("index"))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 @app.route('/journal', methods=['GET', 'POST'])
 def create_journal():
@@ -102,38 +148,7 @@ def user_journal_list(user_id):
         url = url_for('specific_journal_page', user_id=user_id, journal_id=journal_id)
         titles_and_ids.append([entry.title, url])
     return render_template('user_journals_list.html', title="Your Journal Entries", title_list=titles_and_ids)
-    # Now that you have tokens (yay) let's find and hit the URL
-    # from Google that gives you the user's profile information,
-    # including their Google profile image and email
-    userinfo_endpoint = google_provider_cfg["userinfo_endpoint"]
-    uri, headers, body = client.add_token(userinfo_endpoint)
-    userinfo_response = requests.get(uri, headers=headers, data=body)
 
-    # You want to make sure their email is verified.
-    # The user authenticated with Google, authorized your
-    # app, and now you've verified their email through Google!
-    if userinfo_response.json().get("email_verified"):
-        unique_id = userinfo_response.json()["sub"]
-        users_email = userinfo_response.json()["email"]
-        picture = userinfo_response.json()["picture"]
-        users_name = userinfo_response.json()["given_name"]
-    else:
-        return "User email not available or not verified by Google.", 400
-
-    # Create a user in your db with the information provided
-    # by Google
-    names = users_name.split("")
-    user = User(user_id = unique_id, email= users_email, first_name=names[0], last_name=names[1] )
-
-    # Doesn't exist? Add it to the database.
-    if not User.get(unique_id):
-        User.create(unique_id, users_name, users_email, picture)
-
-    # Begin user session by logging the user in
-    login_user(user)
-
-    # Send user back to homepage
-    return redirect(url_for("index"))
 
 @app.route('/journal/<user_id>/<journal_id>')
 def specific_journal_page(user_id, journal_id):
