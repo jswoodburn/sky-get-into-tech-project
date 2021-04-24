@@ -28,6 +28,13 @@ class Journal(db.Model):
     title = db.Column('journal_title', db.String(200), nullable=False)
     deleted = db.Column('deleted', db.Boolean, nullable=False)
 
-    #create a string to return model
+
+class JournalTheme(db.Model):
+    __table_args__ = {'extend_existing': True}
+    theme_id = db.Column('theme_id', db.Integer, primary_key=True, nullable=False)
+    theme = db.Column('theme', db.String(3000), nullable=False)
+
+
+#create a string to return model
     # def __repr__(self):
     #     return '<Title %r>' % self.title
