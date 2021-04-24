@@ -1,7 +1,5 @@
-from application.create import db
-
+from application import db
 from datetime import datetime
-
 
 class User(db.Model):
     __table_args__ = {'extend_existing': True}
@@ -25,10 +23,10 @@ class Journal(db.Model):
     journal_id = db.Column('journal_id', db.Integer, primary_key=True, nullable=False)
     date = db.Column('date_created', db.Date, nullable=False, default=datetime.utcnow())
     time = db.Column('time_created', db.Time, nullable=False, default=datetime.utcnow())
-    # author_id = db.Column('author_id', db.Integer, db.ForeignKey('User.user_id'), nullable=False)
+    author_id = db.Column('author_id', db.Integer, db.ForeignKey(User.user_id), nullable=False)
     entry = db.Column('journal_entry', db.String(3000), nullable=False)
     title = db.Column('journal_title', db.String(200), nullable=False)
-    archived = db.Column('is_journal_archived', db.Boolean)
+    deleted = db.Column('deleted', db.Boolean, nullable=False)
 
     #create a string to return model
     # def __repr__(self):
