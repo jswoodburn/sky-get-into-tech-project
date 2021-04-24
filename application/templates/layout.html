@@ -1,32 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Digital Health</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6" crossorigin="anonymous">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+
+    <!-- header font-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-eojmysd53ii+sco/bjgfsiczc+5ndvn2yr8+0rdqr0ql0h+rp48ckxlpbzkgwra6" crossorigin="anonymous">
     <!-- insert style sheet here -->
+
+
     <link rel="shortcut icon" type="image/png" href="../static/favicon-16x16.png">
+    <link rel="stylesheet" href="./templates/stylehomepage.css">
+    <title>Digital Health</title>
 </head>
 
+
 <body>
-    <nav class="navbar navbar-expand-md navbar-light container-fluid align-items-center">
+
+    <header id="homepage" class="site-header">
+
+        <nav class="navbar navbar-expand-md navbar-light container-fluid align-items-center">
         <a class="navbar-brand col-sm-2" href="homepage.html">
             <img src="../static/digital_health_logo.png" class="img-responsive rounded float=left" alt="Digital Health">
         </a>
         <button class="navbar-toggler align-items-center" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav mr-auto">
-              <li class="nav-item active">
+        <sec class="collapse navbar-collapse" id="navbarSupportedContent">
+            <div class="navbar-nav ml-auto">
                 <a class="nav-link" href="/home">Home<span class="sr-only"></span></a>
-              </li>
-              <li class="nav-item active">
                 <a class="nav-link" href="/journal">Journal<span class="sr-only"></span></a>
-              </li>
-            </ul>
-        </div>
+                <a class="nav-item nav-link" href="#page-impactfulMedia">Impactful Media</a>
+                <a class="nav-item nav-link" href="#page-community">Community</a>
+
+            </div>
+        </sec>
         <form>
             <div class="form-row align-items-center col-sm-4">
                 <div class="col-auto">
@@ -42,7 +50,7 @@
     <!-- below here needs moving to homepage once tested -->
 
     <div class="container">
-        <div class="d-flex flex-row-reverse">
+        <div class="d-flex ml-auto">
             <div class="p-6">
                 <h3>Create meaningful change in your digital life</h3>
             </div>
