@@ -1,16 +1,46 @@
+from flask_login import UserMixin
 class User:
 
     # all this info needs to be saved off to SQL
 
     numCreated = 0
 
-    def __init__(self, email, password):
-        self.mindful_minutes = 0
-        self.journal_words = 0
-        self._email = email  # add a try/except for valid email (or have this in JS)
-        self._password = password  # maybe add password rules (try/except or JS)
-        User.numCreated += 1
-        self.user_id = User.numCreated
+
+    from db import get_db
+
+    class User(UserMixin):
+        def __init__(self, id_, name, email, profile_pic):
+            self.id = id_
+            self.name = name
+            self.email = email
+            self.profile_pic = profile_pic
+            self.mindful_minutes = 0
+            self.journal_words = 0
+
+        @staticmethod
+        #This needs to change to match our db structure
+        def get(user_id):
+            db = get_db()
+            user = db.execute(
+                "SELECT * FROM user WHERE id = ?", (user_id,)
+            ).fetchone()
+            if not user:
+                return None
+
+            user = User(
+                id_=user[0], name=user[1], email=user[2], profile_pic=user[3]
+            )
+            return user
+
+        @staticmethod
+        def create(id_, name, email, profile_pic):
+            db = get_db()
+            db.execute(
+                "INSERT INTO user (id, name, email, profile_pic) "
+                "VALUES (?, ?, ?, ?)",
+                (id_, name, email, profile_pic),
+            )
+            db.commit()
 
     @property
     def forename(self):
@@ -31,16 +61,6 @@ class User:
     def __str__(self):
         return [self.user_id, f"{self._first_name} {self._last_name}"]
 
-    @property
-    def email_address(self):
-        return self._email
-
-    @email_address.setter
-    def email(self, address):
-        self._email = address
-
-    def change_password(self, new_password):
-        self._password = new_password
 
     @property
     def mindfulness(self):
