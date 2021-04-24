@@ -10,12 +10,11 @@ from application.models import User, Journal
 from datetime import datetime
 
 
-# Flask-Login helper to retrieve a user from our db
-@login_manager.user_loader
-def load_user(user_id):
-    user = db.session.query(User).get(user_id)
-    return user
-
+# # Flask-Login helper to retrieve a user from our db
+# @login_manager.user_loader
+# def load_user(user_id):
+#     user = db.session.query(User).get(user_id)
+#     return user
 
 # ----------- ROUTES -----------------
 
@@ -27,7 +26,9 @@ def home():
         user_id = current_user.id
         user = db.session.query(User).get(user_id)
         first_name = user.first_name
-        return render_template('homepage.html', title='Home', is_logged_in=True, name=first_name)
+        # return render_template('homepage.html', title='Home', is_logged_in=True, name=first_name)
+        return render_template('homepage.html', title='Home', is_logged_in=True)
+
     else:
         return render_template('homepage.html', title='Home', is_logged_in=False)
 
