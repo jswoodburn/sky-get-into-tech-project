@@ -1,15 +1,30 @@
 from flask import render_template, request, url_for
+from flask_login import current_user
 from werkzeug.utils import redirect
 from application import app, db
 from application.forms.journalform import JournalForm
 from application.models import User, Journal
 from datetime import datetime
 
-
+#homepage needs to be edited so it redirects
 @app.route('/')
 @app.route('/home')
 def home():
-    return render_template('homepage.html', title='Home')
+    if current_user.is_authenticated:
+        user_id = current_user.id
+        user = db.session.query(User).get(user_id)
+        first_name = user.first_name
+        return render_template('homepage.html', title='Home', is_logged_in=True, name=first_name)
+    else:
+        return render_template('homepage.html', title='Home', is_logged_in=False)
+
+@app.route('/login')
+def login():
+    return render_template('login.html', title='Home')
+
+@app.route('/login/callback')
+def login():
+    return render_template('login.html', title='Home')
 
 
 @app.route('/journal', methods=['GET', 'POST'])
