@@ -22,14 +22,14 @@ from datetime import datetime
 @app.route('/')
 @app.route('/home')
 def home():
-    if current_user.is_authenticated:
-        user_id = current_user.id
-        user = db.session.query(User).get(user_id)
-        first_name = user.first_name
-        # return render_template('homepage.html', title='Home', is_logged_in=True, name=first_name)
-        return render_template('homepage.html', title='Home', is_logged_in=True)
-
-    else:
+    # if current_user.is_authenticated:
+    #     user_id = current_user.id
+    #     user = db.session.query(User).get(user_id)
+    #     first_name = user.first_name
+    #     # return render_template('homepage.html', title='Home', is_logged_in=True, name=first_name)
+    #     return render_template('homepage.html', title='Home', is_logged_in=True)
+    #
+    # else:
         return render_template('homepage.html', title='Home', is_logged_in=False)
 
 
@@ -108,6 +108,11 @@ def callback():
 
     # Send user back to homepage
     return redirect(url_for("index"))
+
+
+@app.route('/mindfulness')
+def mindfulness():
+    return render_template('mindfulness.html', title='Mindfulness')
 
 
 @app.route('/journal', methods=['GET', 'POST'])
