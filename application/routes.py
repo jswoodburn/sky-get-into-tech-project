@@ -1,7 +1,6 @@
 from flask import render_template, request, url_for
 from flask_login import current_user
 from google.auth.transport import requests
-
 from application.__init__ import get_google_provider_cfg, client, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, login_manager
 from werkzeug.utils import redirect
 from application import app, db
@@ -108,7 +107,7 @@ def callback():
     login_user(user)
 
     # Send user back to homepage
-    return redirect(url_for("index"))
+    return redirect(url_for("impactfulmedia"))
 
 
 @app.route('/mindfulness')
@@ -119,13 +118,26 @@ def mindfulness():
 @app.route('/impactfulmedia')
 def impactfulmedia():
 
-    auth = tweepy.OAuthHandler('1355474665972621316-bJ6CSf9lyNAk2BwX1PteX7MHWGuWuW', 'gLdn3qGvoexqdTHVBgwRvUWtWJ5muwaFygKqHFempGbc8')
-    auth.set_access_token('NlbsxFh5G432C2c9vpPTpJOzA', 'CgpXyeypQmYA2ihCQUvV9B0ssa7GuUqa4ZSHs7gihdE7YjRcdw')
+    auth = tweepy.OAuthHandler("VXNAakrOK2uorxArIJGWWLYlC", "ND4xneY9OboE4kQJe2IhhUwZdHb1qh366HiWVcGkCAAs9UghLv")
+    auth.set_access_token("1355474665972621316-dWfZkdGO6xLSpSDIn2khGc4V2l5j0Y", "sSnf7RrNQDVY2SBE5H5sO4qN0LJ7wscwGdmF6SizpG2XW")
     api = tweepy.API(auth)
 
     search = request.args.get('q')
 
     public_tweets = api.user_timeline(search)
+    # Define the search term and the date_since date as variables
+    search_words = "#goodnews"
+    date_since = "2021-03-03"
+    tweets = tw.Cursor(api.search,
+                       q=search_words,
+                       lang="en",
+                       since=date_since).items(5)
+
+    tweets = tw.Cursor(api.search,
+                       q=search_words,
+                       lang="en",
+                       since=date_since).items(5)
+    tweets
 
     return render_template('impactfulmedia.html', title='Impactful Media')
 
