@@ -119,8 +119,8 @@ def mindfulness():
 @app.route('/impactfulmedia')
 def impactfulmedia():
 
-    auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
-    auth.set_access_token(access_token, access_token_secret)
+    auth = tweepy.OAuthHandler('1355474665972621316-bJ6CSf9lyNAk2BwX1PteX7MHWGuWuW', 'gLdn3qGvoexqdTHVBgwRvUWtWJ5muwaFygKqHFempGbc8')
+    auth.set_access_token('NlbsxFh5G432C2c9vpPTpJOzA', 'CgpXyeypQmYA2ihCQUvV9B0ssa7GuUqa4ZSHs7gihdE7YjRcdw')
     api = tweepy.API(auth)
 
     search = request.args.get('q')
