@@ -192,11 +192,11 @@ body {
   background: var(--light-blue);
 }
 
-@media screen and (min-width: 768px) {
+/*@media screen and (min-width: 768px) {
   #page-floater {
     margin: 150px 0 150px 0;
   }
-
+*/
   .layout-floater .layout-container {
     position: relative;
   }
@@ -213,3 +213,14 @@ body {
 .layout-social .layout-icon {
   font-size: 2em;
 }
+
+ .bd-placeholder-img {
+        font-size: 1.125rem;
+        text-anchor: middle;
+      }
+
+@media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+          font-size: 3.5rem;
+        }
+      }
