@@ -22,14 +22,14 @@ from datetime import datetime
 @app.route('/')
 @app.route('/home')
 def home():
-    # if current_user.is_authenticated:
-    #     user_id = current_user.id
-    #     user = db.session.query(User).get(user_id)
-    #     first_name = user.first_name
-    #     # return render_template('homepage.html', title='Home', is_logged_in=True, name=first_name)
-    #     return render_template('homepage.html', title='Home', is_logged_in=True)
-    #
-    # else:
+    if current_user.is_authenticated:
+        user_id = current_user.id
+        user = db.session.query(User).get(user_id)
+        first_name = user.first_name
+        # return render_template('homepage.html', title='Home', is_logged_in=True, name=first_name)
+        return render_template('homepage.html', title='Home', is_logged_in=True)
+
+    else:
         return render_template('homepage.html', title='Home', is_logged_in=False)
 
 
@@ -37,7 +37,7 @@ def home():
 def login():
     # Find out what URL to hit for Google login
     google_provider_cfg = get_google_provider_cfg()
-    authorization_endpoint = google_provider_cfg["authorization_endpoint"]
+    authorization_endpoint = google_provider_cfg["http://127.0.0.1:5000/login"]
 
     # Use library to construct the request for Google login and provide
     # scopes that let you retrieve user's profile from Google
@@ -50,6 +50,7 @@ def login():
 
 
 @app.route("/login/callback")
+
 def callback():
     # Get authorization code Google sent back to you
     code = request.args.get("code")
