@@ -8,6 +8,7 @@ from application import app, db
 from application.forms.journalform import JournalForm
 from application.models import User, Journal
 from datetime import datetime
+import tweepy
 
 
 # # Flask-Login helper to retrieve a user from our db
@@ -30,7 +31,7 @@ def home():
     #     return render_template('homepage.html', title='Home', is_logged_in=True)
     #
     # else:
-        return render_template('homepage.html', title='Home', is_logged_in=False)
+    return render_template('homepage.html', title='Home', is_logged_in=False)
 
 
 @app.route('/login')
@@ -113,6 +114,20 @@ def callback():
 @app.route('/mindfulness')
 def mindfulness():
     return render_template('mindfulness.html', title='Mindfulness')
+
+
+@app.route('/impactfulmedia')
+def impactfulmedia():
+
+    auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+    auth.set_access_token(access_token, access_token_secret)
+    api = tweepy.API(auth)
+
+    search = request.args.get('q')
+
+    public_tweets = api.user_timeline(search)
+
+    return render_template('impactfulmedia.html', title='Impactful Media')
 
 
 @app.route('/journal', methods=['GET', 'POST'])
