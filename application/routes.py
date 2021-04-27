@@ -1,13 +1,15 @@
 from flask import render_template, request, url_for
-from flask_login import current_user
+from flask_login import current_user, login_required, logout_user, login_user
 from google.auth.transport import requests
-
+import requests
+import requests_oauthlib
 from application.__init__ import get_google_provider_cfg, client, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, login_manager
 from werkzeug.utils import redirect
 from application import app, db
 from application.forms.journalform import JournalForm
 from application.models import User, Journal
 from datetime import datetime
+import json
 
 
 # # Flask-Login helper to retrieve a user from our db
@@ -49,8 +51,7 @@ def login():
     return redirect(request_uri)
 
 
-@app.route("/login/callback")
-
+@app.route("/login/callback", methods=["POST", "GET"])
 def callback():
     # Get authorization code Google sent back to you
     code = request.args.get("code")
@@ -97,8 +98,8 @@ def callback():
 
     # If user does not exist in db, create and add them to it
     if not db.session.query(User).get(unique_id):
-        names = users_name.split("")
-        user = User(user_id=unique_id, email=users_email, first_name=names[0], last_name=names[1])
+        names = users_name
+        user = User(user_id=int(unique_id), email=users_email, first_name=names, last_name=names)
         db.session.add(user)
         db.session.commit()
     else:
@@ -108,6 +109,13 @@ def callback():
     login_user(user)
 
     # Send user back to homepage
+    return redirect(url_for("home"))
+
+
+@app.route("/logout")
+@login_required
+def logout():
+    logout_user()
     return redirect(url_for("index"))
 
 
