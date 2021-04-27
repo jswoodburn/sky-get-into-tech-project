@@ -7,6 +7,7 @@ login_manager = LoginManager()
 class User(db.Model):
     __table_args__ = {'extend_existing': True}
     user_id = db.Column('user_id', db.Integer, primary_key=True, nullable=False)
+    google_id = db.Column('google_id', db.String(50), nullable=False)
     email = db.Column('email', db.String(100), nullable=False, unique=True)
     first_name = db.Column('first_name', db.String(50), nullable=False)
     last_name = db.Column('last_name', db.String(50), nullable=False)
