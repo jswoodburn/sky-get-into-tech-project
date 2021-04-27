@@ -105,7 +105,7 @@ def callback():
         google_id=google_uid, first_name=users_name, email=users_email
     )
 
-    print(user)
+    print(user.id, user.first_name, user.google_id, user.email)
 
     # If user does not exist in db, create and add them to it
     # if not db.session.query(User.id).filter_by(google_id=google_uid):
