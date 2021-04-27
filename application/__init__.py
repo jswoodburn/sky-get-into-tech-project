@@ -23,5 +23,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # Linking app to the persistence layer
 db = SQLAlchemy(app)
 
+
 from application import routes
+
 
