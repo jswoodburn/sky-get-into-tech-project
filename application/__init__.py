@@ -45,7 +45,7 @@ from application import routes
 
 GOOGLE_CLIENT_ID = "1078137073918-2ur6jb9jsihmd95uohhp2hq6qkegnmoa.apps.googleusercontent.com"
 GOOGLE_CLIENT_SECRET = "yEGN03m9WSjLAGkK2azEvqof"
-GOOGLE_DISCOVERY_URL = "http://127.0.0.1:5000/login/auth"
+GOOGLE_DISCOVERY_URL = "https://accounts.google.com/.well-known/openid-configuration"
 
 # User session management setup
 # https://flask-login.readthedocs.io/en/latest
