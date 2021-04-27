@@ -5,6 +5,7 @@ import requests
 from flask import render_template, request, url_for
 from flask_login import current_user, login_required, logout_user, login_user
 from google.auth.transport import requests
+import google.auth.transport.requests
 from sqlalchemy import exists
 from werkzeug.utils import redirect
 
