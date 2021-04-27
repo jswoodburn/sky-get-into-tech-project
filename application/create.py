@@ -15,6 +15,7 @@ test_user_1 = User(email='jackie.woodburn@gmail.com',
 db.session.add(test_user_1)
 db.session.commit()
 
+
 # input sample data here
 test_journal_1 = Journal(date=datetime.now().date(), time=datetime.now().time(), author_id=1, entry="This is a test "
                                                                                                     "entry.",
