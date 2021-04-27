@@ -22,6 +22,8 @@ app = Flask(__name__)
 # app.secret_key = 'skyGIT'
 app.secret_key = os.environ.get("SECRET_KEY") or os.urandom(24)
 
+
+
 # make sure the username, password and database name are correct
 
 username = 'newuser'
@@ -59,8 +61,8 @@ from application.models import User
 
 
 @login_manager.user_loader
-def load_user(user_id):
-    return User.get(user_id)
+def load_user(id):
+    return User.query.get(id)
 
 
 def get_google_provider_cfg():

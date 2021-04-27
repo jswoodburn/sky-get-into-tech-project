@@ -3,6 +3,8 @@ from flask_login import current_user, login_required, logout_user, login_user
 from google.auth.transport import requests
 import requests
 import requests_oauthlib
+from sqlalchemy import exists
+
 from application.__init__ import get_google_provider_cfg, client, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, login_manager
 from werkzeug.utils import redirect
 from application import app, db
@@ -14,8 +16,8 @@ import json
 
 # # Flask-Login helper to retrieve a user from our db
 # @login_manager.user_loader
-# def load_user(user_id):
-#     user = db.session.query(User).get(user_id)
+# def load_user(id):
+#     user = db.session.query(User).get(id)
 #     return user
 
 # ----------- ROUTES -----------------
@@ -98,19 +100,27 @@ def callback():
         users_name = userinfo_response.json()["given_name"]
     else:
         return "User email not available or not verified by Google.", 400
-    print(db.session.query(User.user_id).filter_by(google_id=google_uid))
+    # print(db.session.query(User.id).filter_by(google_id=google_uid))
+    user = User(
+        google_id=google_uid, first_name=users_name, email=users_email
+    )
     # If user does not exist in db, create and add them to it
-    if not db.session.query(User.user_id).filter_by(google_id=google_uid):
+    # if not db.session.query(User.id).filter_by(google_id=google_uid):
+    if not db.session.query(User.id):
         print("we are in if")
-        names = users_name
-        user = User(google_id=google_uid, email=users_email, first_name=names, last_name=names)
         db.session.add(user)
         db.session.commit()
-    else:
-        print("we are in else")
-        user = db.session.query(User).filter_by(google_id=google_uid).first()
+    # else:
+    #     @login_manager.user_loader
+    #     def load_user(id):
+    #         return User.get(id)
+    #     print("we are in else")
+    #     user = db.session.query(User).filter_by(google_id=google_uid).first()
+    # if not db.session.query(User.id).filter_by(google_id=google_uid):
+    # if google_uid=db.session.query(User.google_id):
 
     # Begin user session by logging the user in
+
     login_user(user)
 
     # Send user back to homepage
@@ -153,7 +163,7 @@ def create_journal():
     # return render_template('journalv2.html', form=form, message=error)
 
 
-@app.route('/journal/<user_id>')
+@app.route('/journal/<id>')
 # need to add filter_by(deleted==False) or something so that don't get stuff that's been deleted
 def user_journal_list(user_id):
     author_entries = db.session.query(Journal.journal_id).filter_by(author_id=1).order_by(Journal.date).order_by(
@@ -167,7 +177,7 @@ def user_journal_list(user_id):
     return render_template('user_journals_list.html', title="Your Journal Entries", title_list=titles_and_ids)
 
 
-@app.route('/journal/<user_id>/<journal_id>')
+@app.route('/journal/<id>/<journal_id>')
 def specific_journal_page(user_id, journal_id):
     journal = db.session.query(Journal).get(journal_id)
     author = db.session.query(User).get(journal.author_id)
@@ -179,9 +189,9 @@ def specific_journal_page(user_id, journal_id):
                                time=time, author=f"{author.first_name} {author.last_name}")
 
 
-@app.route('/journal/<user_id>/<journal_id>/edit', methods=["GET", "POST"])
+@app.route('/journal/<id>/<journal_id>/edit', methods=["GET", "POST"])
 def edit_journal(user_id, journal_id):
-    # only people who's user ID matches the user_id should be able to access edit page
+    # only people who's user ID matches the id should be able to access edit page
     # put in an if loop for this later when have user sessions
     # also add in a delete button that fills out deleted column
 
