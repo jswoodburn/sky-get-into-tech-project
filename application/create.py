@@ -1,5 +1,6 @@
 from application import db
 from models import User, Journal, JournalTheme
+from sqlalchemy.sql import exists
 from datetime import datetime
 
 # EVERYONE RUN THIS TO GET DBS SYNCED UP
@@ -15,6 +16,7 @@ test_user_1 = User(google_id='101399590782175635333', email='jackie.woodburn@gma
 db.session.add(test_user_1)
 db.session.commit()
 
+print(db.session.query(exists().where(User.google_id == '101399575635333')).scalar())
 # # input sample data here
 # test_journal_1 = Journal(date=datetime.now().date(), time=datetime.now().time(), author_id=1, entry="This is a test "
 #                                                                                                     "entry.",

@@ -1,16 +1,17 @@
+import json
+from datetime import datetime
+
+import requests
 from flask import render_template, request, url_for
 from flask_login import current_user, login_required, logout_user, login_user
 from google.auth.transport import requests
-import requests
-import requests_oauthlib
 from sqlalchemy import exists
-from application.__init__ import get_google_provider_cfg, client, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, login_manager
 from werkzeug.utils import redirect
+
 from application import app, db
+from application.__init__ import get_google_provider_cfg, client, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
 from application.forms.journalform import JournalForm
 from application.models import User, Journal
-from datetime import datetime
-import json
 
 
 # # Flask-Login helper to retrieve a user from our db
@@ -105,11 +106,10 @@ def callback():
         google_id=google_uid, first_name=users_name, email=users_email
     )
 
-    print(user.id, user.first_name, user.google_id, user.email)
 
     # If user does not exist in db, create and add them to it
     # if not db.session.query(User.id).filter_by(google_id=google_uid):
-    if not db.session.query(User).get(user.id):
+    if not db.session.query(exists().where(User.google_id == google_uid)).scalar():
         print("User does not exist")
         db.session.add(user)
         db.session.commit()
