@@ -8,3 +8,4 @@ Flask
 oauthlib
 pyOpenSSL
 Flask-Login
+models
