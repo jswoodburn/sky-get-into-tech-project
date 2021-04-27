@@ -54,7 +54,7 @@ def login():
 
 @app.route("/login/callback", methods=["POST", "GET"])
 def callback():
-    print("function is running 1")
+
     # Get authorization code Google sent back to you
     code = request.args.get("code")
 
@@ -62,7 +62,7 @@ def callback():
     # things on behalf of a user
     google_provider_cfg = get_google_provider_cfg()
     token_endpoint = google_provider_cfg["token_endpoint"]
-    print("function is running 2")
+
     # Prepare and send a request to get tokens! Yay tokens!
     token_url, headers, body = client.prepare_token_request(
         token_endpoint,
@@ -70,25 +70,25 @@ def callback():
         redirect_url=request.base_url,
         code=code
     )
-    print("function is running 3")
+
     token_response = requests.post(
         token_url,
         headers=headers,
         data=body,
         auth=(GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET),
     )
-    print("function is running 4")
+
 
     # Parse the tokens!
     client.parse_request_body_response(json.dumps(token_response.json()))
-    print("function is running 5")
+
     # Now that you have tokens (yay) let's find and hit the URL
     # from Google that gives you the user's profile information,
     # including their Google profile image and email
     userinfo_endpoint = google_provider_cfg["userinfo_endpoint"]
     uri, headers, body = client.add_token(userinfo_endpoint)
     userinfo_response = requests.get(uri, headers=headers, data=body)
-    print("function is running 6")
+
     # You want to make sure their email is verified.
     # The user authenticated with Google, authorized your
     # app, and now you've verified their email through Google!
@@ -99,24 +99,23 @@ def callback():
         users_name = userinfo_response.json()["given_name"]
     else:
         return "User email not available or not verified by Google.", 400
+
     # print(db.session.query(User.id).filter_by(google_id=google_uid))
     user = User(
         google_id=google_uid, first_name=users_name, email=users_email
     )
+
+    print(user)
+
     # If user does not exist in db, create and add them to it
     # if not db.session.query(User.id).filter_by(google_id=google_uid):
-    if not db.session.query(User.id):
-        print("we are in if")
+    if not db.session.query(User).get(user.id):
+        print("User does not exist")
         db.session.add(user)
         db.session.commit()
-    # else:
-    #     @login_manager.user_loader
-    #     def load_user(id):
-    #         return User.get(id)
-    #     print("we are in else")
-    #     user = db.session.query(User).filter_by(google_id=google_uid).first()
-    # if not db.session.query(User.id).filter_by(google_id=google_uid):
-    # if google_uid=db.session.query(User.google_id):
+    else:
+        print("User does exist")
+        user = db.session.query(User).filter_by(google_id=google_uid).first()
 
     # Begin user session by logging the user in
 
