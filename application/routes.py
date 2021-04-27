@@ -4,7 +4,6 @@ from google.auth.transport import requests
 import requests
 import requests_oauthlib
 from sqlalchemy import exists
-
 from application.__init__ import get_google_provider_cfg, client, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, login_manager
 from werkzeug.utils import redirect
 from application import app, db
@@ -28,7 +27,7 @@ import json
 def home():
     if current_user.is_authenticated:
         user_id = current_user.id
-        user = db.session.query(User).get(user_id)
+        user = db.session.query(User).get(id)
         first_name = user.first_name
         # return render_template('homepage.html', title='Home', is_logged_in=True, name=first_name)
         return render_template('homepage.html', title='Home', is_logged_in=True)
@@ -131,7 +130,7 @@ def callback():
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for("index"))
+    return redirect(url_for("home"))
 
 
 @app.route('/mindfulness')
