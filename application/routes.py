@@ -1,15 +1,136 @@
+import json
+from datetime import datetime
+
+import requests
 from flask import render_template, request, url_for
+from flask_login import current_user, login_required, logout_user, login_user
+# from google.auth.transport import requests
+import requests
+from sqlalchemy import exists
 from werkzeug.utils import redirect
+
 from application import app, db
+from application.__init__ import get_google_provider_cfg, client, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
 from application.forms.journalform import JournalForm
 from application.models import User, Journal
-from datetime import datetime
+
+
+# # Flask-Login helper to retrieve a user from our db
+# @login_manager.user_loader
+# def load_user(id):
+#     user = db.session.query(User).get(id)
+#     return user
+
+# ----------- ROUTES -----------------
 
 
 @app.route('/')
 @app.route('/home')
 def home():
-    return render_template('homepage.html', title='Home')
+    if current_user.is_authenticated:
+        first_name = db.session.query(User).get(id)
+        return render_template('homepage.html', title='Home', is_logged_in=True,
+                               first_name=f"{current_user.first_name}")
+
+    else:
+        return render_template('homepage.html', title='Home', is_logged_in=False)
+
+
+@app.route('/login')
+def login():
+    # Find out what URL to hit for Google login
+    google_provider_cfg = get_google_provider_cfg()
+    authorization_endpoint = google_provider_cfg["authorization_endpoint"]
+
+    # Use library to construct the request for Google login and provide
+    # scopes that let you retrieve user's profile from Google
+    request_uri = client.prepare_request_uri(
+        authorization_endpoint,
+        redirect_uri=request.base_url + "/callback",
+        scope=["openid", "email", "profile"],
+    )
+    return redirect(request_uri)
+
+
+@app.route("/login/callback", methods=["POST", "GET"])
+def callback():
+    # Get authorization code Google sent back to you
+    code = request.args.get("code")
+
+    # Find out what URL to hit to get tokens that allow you to ask for
+    # things on behalf of a user
+    google_provider_cfg = get_google_provider_cfg()
+    token_endpoint = google_provider_cfg["token_endpoint"]
+
+    # Prepare and send a request to get tokens! Yay tokens!
+    token_url, headers, body = client.prepare_token_request(
+        token_endpoint,
+        authorization_response=request.url,
+        redirect_url=request.base_url,
+        code=code
+    )
+
+    token_response = requests.post(
+        token_url,
+        headers=headers,
+        data=body,
+        auth=(GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET),
+    )
+
+    # Parse the tokens!
+    client.parse_request_body_response(json.dumps(token_response.json()))
+
+    # Now that you have tokens (yay) let's find and hit the URL
+    # from Google that gives you the user's profile information,
+    # including their Google profile image and email
+    userinfo_endpoint = google_provider_cfg["userinfo_endpoint"]
+    uri, headers, body = client.add_token(userinfo_endpoint)
+    userinfo_response = requests.get(uri, headers=headers, data=body)
+
+    # You want to make sure their email is verified.
+    # The user authenticated with Google, authorized your
+    # app, and now you've verified their email through Google!
+    if userinfo_response.json().get("email_verified"):
+        google_uid = userinfo_response.json()["sub"]
+        users_email = userinfo_response.json()["email"]
+        picture = userinfo_response.json()["picture"]
+        users_name = userinfo_response.json()["given_name"]
+    else:
+        return "User email not available or not verified by Google.", 400
+
+    # print(db.session.query(User.id).filter_by(google_id=google_uid))
+    user = User(
+        google_id=google_uid, first_name=users_name, email=users_email
+    )
+
+    # If user does not exist in db, create and add them to it
+    # if not db.session.query(User.id).filter_by(google_id=google_uid):
+    if not db.session.query(exists().where(User.google_id == google_uid)).scalar():
+        print("User does not exist")
+        db.session.add(user)
+        db.session.commit()
+    else:
+        print("User does exist")
+        user = db.session.query(User).filter_by(google_id=google_uid).first()
+
+    # Begin user session by logging the user in
+
+    login_user(user)
+
+    # Send user back to homepage
+    return redirect(url_for("home"))
+
+
+@app.route("/logout")
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for("home"))
+
+
+@app.route('/mindfulness')
+def mindfulness():
+    return render_template('mindfulness.html', title='Mindfulness')
 
 
 @app.route('/journal', methods=['GET', 'POST'])
@@ -36,20 +157,21 @@ def create_journal():
     # return render_template('journalv2.html', form=form, message=error)
 
 
-@app.route('/journal/<user_id>')
+@app.route('/journal/<id>')
 # need to add filter_by(deleted==False) or something so that don't get stuff that's been deleted
-def user_journal_list(user_id):
-    author_entries = db.session.query(Journal.journal_id).filter_by(author_id=1).order_by(Journal.date).order_by(Journal.time)
+def user_journal_list(id):
+    author_entries = db.session.query(Journal.journal_id).filter_by(author_id=1).order_by(Journal.date).order_by(
+        Journal.time)
     titles_and_ids = []
     for id in author_entries:
         journal_id = id[0]
         entry = db.session.query(Journal).get(journal_id)
-        url = url_for('specific_journal_page', user_id=user_id, journal_id=journal_id)
+        url = url_for('specific_journal_page', id=id, journal_id=journal_id)
         titles_and_ids.append([entry.title, url])
     return render_template('user_journals_list.html', title="Your Journal Entries", title_list=titles_and_ids)
 
 
-@app.route('/journal/<user_id>/<journal_id>')
+@app.route('/journal/<id>/<journal_id>')
 def specific_journal_page(user_id, journal_id):
     journal = db.session.query(Journal).get(journal_id)
     author = db.session.query(User).get(journal.author_id)
@@ -58,13 +180,12 @@ def specific_journal_page(user_id, journal_id):
         return render_template('deleted_journal_entry.html', title="Entry not found")
     else:
         return render_template('journal_entry.html', title=journal.title, entry=journal.entry, date=journal.date,
-                           time=time, author=f"{author.first_name} {author.last_name}")
+                               time=time, author=f"{author.first_name} {author.last_name}")
 
 
-@app.route('/journal/<user_id>/<journal_id>/edit', methods=["GET", "POST"])
-def edit_journal(user_id, journal_id):
-
-    # only people who's user ID matches the user_id should be able to access edit page
+@app.route('/journal/<id>/<journal_id>/edit', methods=["GET", "POST"])
+def edit_journal(journal_id):
+    # only people who's user ID matches the id should be able to access edit page
     # put in an if loop for this later when have user sessions
     # also add in a delete button that fills out deleted column
 
@@ -95,10 +216,11 @@ def edit_journal(user_id, journal_id):
     # return render_template('journalv2.html', form=form, message=error)
 
 
-# ------- FOR REFERENCE - DELETE ON MERGE ------- SQL ALCHEMY QUERIES AND UPDATES -------- #
-# journal_1 = db.session.query(Journal).get(1)
-# journal_1.date = '2000-02-01'
-# author_1_entries = db.session.query(Journal.title).filter_by(author_id=1).order_by(Journal.date).order_by(Journal.time)
-# print(author_1_entries[:])
-# db.session.add(journal_1)
-# db.session.commit()
+@app.route('/profile', methods=['GET', 'POST'])
+@login_required
+def profile():
+    first_name = db.session.query(User).get(id)
+
+    return render_template('profile.html', first_name=f"{current_user.first_name}")
+                           # number_of_journals=number_of_journals,
+                           # mindful_moments=mindful_moments)

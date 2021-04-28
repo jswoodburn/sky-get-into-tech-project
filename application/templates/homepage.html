@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {% extends "layout.html" %}
 
 {% block body_content %}
@@ -8,5 +9,12 @@
     </div>
     <p>This is the home page.</p>
 
+=======
+{% extends "layout.html" %} {% block body_content %}
+{% if is_logged_in %}
+    <p>Welcome back, {{first_name}}</p>
+{% endif %}
+<p>This is the home page.</p>
+>>>>>>> googleauth
 {% endblock %}
 
