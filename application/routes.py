@@ -28,11 +28,8 @@ from application.models import User, Journal
 @app.route('/home')
 def home():
     if current_user.is_authenticated:
-        # user_id = current_user.id
-        # user = db.session.query(User).get(id)
-        # first_name = user.first_name
-        # return render_template('homepage.html', title='Home', is_logged_in=True, name=first_name)
-        return render_template('homepage.html', title='Home', is_logged_in=True)
+        first_name = db.session.query(User).get(id)
+        return render_template('homepage.html', title='Home', is_logged_in=True, first_name=f"{current_user.first_name}")
 
     else:
         return render_template('homepage.html', title='Home', is_logged_in=False)
@@ -164,14 +161,14 @@ def create_journal():
 
 @app.route('/journal/<id>')
 # need to add filter_by(deleted==False) or something so that don't get stuff that's been deleted
-def user_journal_list(user_id):
+def user_journal_list(id):
     author_entries = db.session.query(Journal.journal_id).filter_by(author_id=1).order_by(Journal.date).order_by(
         Journal.time)
     titles_and_ids = []
     for id in author_entries:
         journal_id = id[0]
         entry = db.session.query(Journal).get(journal_id)
-        url = url_for('specific_journal_page', user_id=user_id, journal_id=journal_id)
+        url = url_for('specific_journal_page', id=id, journal_id=journal_id)
         titles_and_ids.append([entry.title, url])
     return render_template('user_journals_list.html', title="Your Journal Entries", title_list=titles_and_ids)
 
@@ -189,7 +186,7 @@ def specific_journal_page(user_id, journal_id):
 
 
 @app.route('/journal/<id>/<journal_id>/edit', methods=["GET", "POST"])
-def edit_journal(user_id, journal_id):
+def edit_journal(journal_id):
     # only people who's user ID matches the id should be able to access edit page
     # put in an if loop for this later when have user sessions
     # also add in a delete button that fills out deleted column
@@ -219,3 +216,10 @@ def edit_journal(user_id, journal_id):
     form.entry.data = journal_to_edit.entry
     return render_template('create_journal_entry.html', form=form, message=error)
     # return render_template('journalv2.html', form=form, message=error)
+
+
+@app.route('/profile/<id>', methods=['GET', 'POST'])
+@login_required
+def profile(first_name, number_of_journals, mindful_moments):
+    return render_template('profile.html', first_name=first_name, number_of_journals=number_of_journals,
+                           mindful_moments=mindful_moments)
