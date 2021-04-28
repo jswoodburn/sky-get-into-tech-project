@@ -1,20 +1,7 @@
-<<<<<<< HEAD
-{% extends "layout.html" %}
-
-{% block body_content %}
-<div class="row" p-8>
-        <div class="ml-auto">
-                <h3>Create meaningful change in your digital life </h3>
-        </div>
-    </div>
-    <p>This is the home page.</p>
-
-=======
 {% extends "layout.html" %} {% block body_content %}
 {% if is_logged_in %}
     <p>Welcome back, {{first_name}}</p>
 {% endif %}
 <p>This is the home page.</p>
->>>>>>> googleauth
 {% endblock %}
 

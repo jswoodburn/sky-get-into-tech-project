@@ -28,23 +28,16 @@
 
         <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
           <li class="nav-item active">
-            <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+            <a class="nav-link" href="/home">Home <span class="sr-only">(current)</span></a>
           </li>
-<<<<<<< HEAD
           <li class="nav-item">
-            <a class="nav-link" href="#">Journal</a>
+            <a class="nav-link" href="/journal">Journal</a>
            <li class="nav-item">
-            <a class="nav-link" href="#">Mindfulness</a>
+            <a class="nav-link" href="/mindfulness">Mindfulness</a>
           <li class="nav-item">
-            <a class="nav-link" href="#">Impactful Media</a>
+            <a class="nav-link" href="/impactfulmedia">Impactful Media</a>
           <li class="nav-item">
-            <a class="nav-link disabled" href="#">Community</a>
-=======
-          <li class="nav-item active">
-            <a class="nav-link" href="/journal"
-              >Journal<span class="sr-only"></span
-            ></a>
-          </li>
+            <a class="nav-link disabled" href="/community">Community</a>
           {% if is_logged_in %}
           <li class="nav-item active">
             <a href="/profile">My profile</a>
@@ -52,7 +45,6 @@
           {% else %}
           <li class="nav-item active">
             <a href="/login">Login</a>
->>>>>>> googleauth
           </li>
           {% endif %}
         </ul>

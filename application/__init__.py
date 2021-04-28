@@ -44,9 +44,7 @@ db = SQLAlchemy(app)
 
 from application import routes
 
-<<<<<<< HEAD
 
-=======
 # ----------- GOOGLE AUTH ---------------
 
 GOOGLE_CLIENT_ID = "1078137073918-2ur6jb9jsihmd95uohhp2hq6qkegnmoa.apps.googleusercontent.com"
