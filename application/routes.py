@@ -29,7 +29,8 @@ from application.models import User, Journal
 def home():
     if current_user.is_authenticated:
         first_name = db.session.query(User).get(id)
-        return render_template('homepage.html', title='Home', is_logged_in=True, first_name=f"{current_user.first_name}")
+        return render_template('homepage.html', title='Home', is_logged_in=True,
+                               first_name=f"{current_user.first_name}")
 
     else:
         return render_template('homepage.html', title='Home', is_logged_in=False)
@@ -53,7 +54,6 @@ def login():
 
 @app.route("/login/callback", methods=["POST", "GET"])
 def callback():
-
     # Get authorization code Google sent back to you
     code = request.args.get("code")
 
@@ -76,7 +76,6 @@ def callback():
         data=body,
         auth=(GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET),
     )
-
 
     # Parse the tokens!
     client.parse_request_body_response(json.dumps(token_response.json()))
@@ -103,7 +102,6 @@ def callback():
     user = User(
         google_id=google_uid, first_name=users_name, email=users_email
     )
-
 
     # If user does not exist in db, create and add them to it
     # if not db.session.query(User.id).filter_by(google_id=google_uid):
@@ -218,8 +216,11 @@ def edit_journal(journal_id):
     # return render_template('journalv2.html', form=form, message=error)
 
 
-@app.route('/profile/<id>', methods=['GET', 'POST'])
+@app.route('/profile', methods=['GET', 'POST'])
 @login_required
-def profile(first_name, number_of_journals, mindful_moments):
-    return render_template('profile.html', first_name=first_name, number_of_journals=number_of_journals,
-                           mindful_moments=mindful_moments)
+def profile():
+    first_name = db.session.query(User).get(id)
+
+    return render_template('profile.html', first_name=f"{current_user.first_name}")
+                           # number_of_journals=number_of_journals,
+                           # mindful_moments=mindful_moments)
