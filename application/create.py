@@ -32,3 +32,5 @@ test_journal_2 = Journal(date=datetime.now().date(), time=datetime.now().time(),
 db.session.add(test_journal_1)
 db.session.add(test_journal_2)
 db.session.commit()
+
+

@@ -4,6 +4,7 @@ from application import app, db
 from application.forms.journalform import JournalForm
 from application.models import User, Journal
 from datetime import datetime
+from sqlalchemy import desc
 
 
 @app.route('/')
@@ -23,7 +24,7 @@ def create_journal():
         author = 1  # ---------------- PLACEHOLDER ----> REPLACE THIS WITH USER ID --------------------------
 
         if len(title) == 0 or len(entry) == 0:
-            error = "Please supply a title and entry"
+            error = "Your journal title and entry cannot be empty."
         else:
             journal_submission = Journal(date=datetime.now().date(), time=datetime.now().time(), author_id=author,
                                          entry=entry, title=title, deleted=False)
@@ -37,15 +38,15 @@ def create_journal():
 
 
 @app.route('/journal/<user_id>')
-# need to add filter_by(deleted==False) or something so that don't get stuff that's been deleted
 def user_journal_list(user_id):
-    author_entries = db.session.query(Journal.journal_id).filter_by(author_id=1).order_by(Journal.date).order_by(Journal.time)
+    author_entries = db.session.query(Journal.journal_id).filter_by(author_id=user_id).filter_by(
+        deleted=False).order_by(desc(Journal.date)).order_by(desc(Journal.time))
     titles_and_ids = []
     for id in author_entries:
         journal_id = id[0]
         entry = db.session.query(Journal).get(journal_id)
         url = url_for('specific_journal_page', user_id=user_id, journal_id=journal_id)
-        titles_and_ids.append([entry.title, url])
+        titles_and_ids.append([entry.title, url, entry.date])
     return render_template('user_journals_list.html', title="Your Journal Entries", title_list=titles_and_ids)
 
 
