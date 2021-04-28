@@ -1,30 +1,22 @@
 {% extends "layout.html" %} {% block body_content %}
 <p>A break from 'doomscrolling', there is still good happening in the world. </p>
-<head>
-	<title>Flask Tweepy Tutorial</title>
-	<link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css">
-</head>
-<body>
-<div class="container">
- <div class="row justify-content-center">
-   <div class="col-md-6">
-     <div class="p-5">
-       <form class="form-inline" method="GET" action="{{ url_for('impactfulmedia') }}">
-	 <input class="form-control" type="text" name="q">
-	 <button class="btn btn-primary" type="submit">search</button>
-       </form>
-     </div>
-	  {% for tweet in tweets %}
+{% for response in rssfeed %}
 	  <div class="card mt-2">
-	    <div class="card-body">
-	      <div class="card-text">
-		  {{ tweet._json.text }}
-	      </div>
-            </div>
-	  </div>
+          <div class="card-text">
+              {{ response._json.text }}
+          </div>
+      </div>
 	  {% endfor %}
-       </div>
-   </div>
- </div>
-</body>
+<!--<?xml version="1.0" encoding="utf-8"?>-->
+<!--<feed xmlns="https://www.goodnewsnetwork.org/category/news/feed/">-->
+<!--    <author>Author's name</author>-->
+<!--    <title>Feed title</title>-->
+<!--    {%for item in items %}-->
+<!--    <entry>-->
+<!--        <title>{{item[0]}}</title>-->
+<!--        <link href="{{item[1]}}"/>-->
+<!--        <content type="html">{{item[2]}}</content>-->
+<!--    </entry>-->
+<!--    {% endfor %}-->
+<!--</feed>-->
 {% endblock %}

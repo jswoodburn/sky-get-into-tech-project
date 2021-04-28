@@ -1,4 +1,4 @@
-from flask import render_template, request, url_for
+from flask import render_template, request, url_for, make_response
 from flask_login import current_user
 from google.auth.transport import requests
 from application.__init__ import get_google_provider_cfg, client, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, login_manager
@@ -8,6 +8,8 @@ from application.forms.journalform import JournalForm
 from application.models import User, Journal
 from datetime import datetime
 import tweepy
+from feedgen.feed import FeedGenerator
+import feedparser
 
 
 # # Flask-Login helper to retrieve a user from our db
@@ -110,16 +112,35 @@ def callback():
     return redirect(url_for("impactfulmedia"))
 
 
+@app.route('/impactfulmedia', methods=['GET'])
+def impactfulmedia():
+    fg = FeedGenerator()
+    fg.title('Good News')
+    fg.description('Feed description')
+    fg.link(href='https://www.goodnewsnetwork.org/category/news/feed/')
+
+    for article in impactfulmedia():  # returns a list of articles from somewhere
+        fe = fg.add_entry()
+        fe.title(article.title)
+        fe.link(href=article.url)
+        fe.description(article.content)
+        fe.guid(article.id, permalink=False)  # Or: fe.guid(article.url, permalink=True)
+        fe.author(name=article.author.name, email=article.author.email)
+        fe.pubDate(article.created_at)
+
+    rssfeed = make_response(fg.rss_str())
+    rssfeed.headers.set('Content-Type', 'application/rss+xml')
+    rssfeed = fg.rss_str(pretty=True)
+
+    # return response
+    return render_template('impactfulmedia.html', title="Mindfulness", rssfeed=rssfeed)
+
+
 @app.route('/mindfulness')
 def mindfulness():
-    return render_template('mindfulness.html', title='Mindfulness')
-
-
-@app.route('/impactfulmedia')
-def impactfulmedia():
-
     auth = tweepy.OAuthHandler("VXNAakrOK2uorxArIJGWWLYlC", "ND4xneY9OboE4kQJe2IhhUwZdHb1qh366HiWVcGkCAAs9UghLv")
-    auth.set_access_token("1355474665972621316-dWfZkdGO6xLSpSDIn2khGc4V2l5j0Y", "sSnf7RrNQDVY2SBE5H5sO4qN0LJ7wscwGdmF6SizpG2XW")
+    auth.set_access_token("1355474665972621316-dWfZkdGO6xLSpSDIn2khGc4V2l5j0Y",
+                          "sSnf7RrNQDVY2SBE5H5sO4qN0LJ7wscwGdmF6SizpG2XW")
     api = tweepy.API(auth)
 
     search = request.args.get('q')
@@ -129,17 +150,16 @@ def impactfulmedia():
     search_words = "#positivity"
     date_since = "2021-03-03"
     tweets = tweepy.Cursor(api.search,
-                       q=search_words,
-                       lang="en",
-                       since=date_since).items(5)
+                           q=search_words,
+                           lang="en",
+                           since=date_since).items(5)
 
     tweets = tweepy.Cursor(api.search,
-                       q=search_words,
-                       lang="en",
-                       since=date_since).items(5)
+                           q=search_words,
+                           lang="en",
+                           since=date_since).items(5)
 
-
-    return render_template('impactfulmedia.html', title='Impactful Media', tweets=tweets)
+    return render_template('mindfulness.html', title='Mindfulness', tweets=tweets)
 
 
 @app.route('/journal', methods=['GET', 'POST'])
