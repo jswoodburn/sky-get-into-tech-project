@@ -126,20 +126,20 @@ def impactfulmedia():
 
     public_tweets = api.user_timeline(search)
     # Define the search term and the date_since date as variables
-    search_words = "#goodnews"
+    search_words = "#positivity"
     date_since = "2021-03-03"
-    tweets = tw.Cursor(api.search,
+    tweets = tweepy.Cursor(api.search,
                        q=search_words,
                        lang="en",
                        since=date_since).items(5)
 
-    tweets = tw.Cursor(api.search,
+    tweets = tweepy.Cursor(api.search,
                        q=search_words,
                        lang="en",
                        since=date_since).items(5)
-    tweets
 
-    return render_template('impactfulmedia.html', title='Impactful Media')
+
+    return render_template('impactfulmedia.html', title='Impactful Media', tweets=tweets)
 
 
 @app.route('/journal', methods=['GET', 'POST'])
