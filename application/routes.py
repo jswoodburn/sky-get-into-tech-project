@@ -4,8 +4,8 @@ from datetime import datetime
 import requests
 from flask import render_template, request, url_for
 from flask_login import current_user, login_required, logout_user, login_user
-from google.auth.transport import requests
-import google.auth.transport.requests
+# from google.auth.transport import requests
+import requests
 from sqlalchemy import exists
 from werkzeug.utils import redirect
 
@@ -28,9 +28,9 @@ from application.models import User, Journal
 @app.route('/home')
 def home():
     if current_user.is_authenticated:
-        user_id = current_user.id
-        user = db.session.query(User).get(id)
-        first_name = user.first_name
+        # user_id = current_user.id
+        # user = db.session.query(User).get(id)
+        # first_name = user.first_name
         # return render_template('homepage.html', title='Home', is_logged_in=True, name=first_name)
         return render_template('homepage.html', title='Home', is_logged_in=True)
 
