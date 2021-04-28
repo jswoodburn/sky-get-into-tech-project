@@ -41,13 +41,17 @@ def create_journal():
 def user_journal_list(user_id):
     author_entries = db.session.query(Journal.journal_id).filter_by(author_id=user_id).filter_by(
         deleted=False).order_by(desc(Journal.date)).order_by(desc(Journal.time))
-    titles_and_ids = []
+    journal_data = []
     for id in author_entries:
         journal_id = id[0]
         entry = db.session.query(Journal).get(journal_id)
         url = url_for('specific_journal_page', user_id=user_id, journal_id=journal_id)
-        titles_and_ids.append([entry.title, url, entry.date])
-    return render_template('user_journals_list.html', title="Your Journal Entries", title_list=titles_and_ids)
+        if len(entry.entry) > 50:
+            shortened_entry = entry.entry[:50] + "..."
+        else:
+            shortened_entry = entry.entry
+        journal_data.append([entry.title, url, entry.date, shortened_entry])
+    return render_template('user_journals_list.html', title="Your Journal Entries", title_list=journal_data)
 
 
 @app.route('/journal/<user_id>/<journal_id>')
