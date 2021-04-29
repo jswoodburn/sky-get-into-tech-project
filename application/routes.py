@@ -141,7 +141,7 @@ def create_journal():
     if request.method == 'POST':
         title = form.title.data
         entry = form.entry.data
-        author = 1  # ---------------- PLACEHOLDER ----> REPLACE THIS WITH USER ID --------------------------
+        author = db.session.query(User).get(id)  # ---------------- PLACEHOLDER ----> REPLACE THIS WITH USER ID --------------------------
 
         if len(title) == 0 or len(entry) == 0:
             error = "Please supply a title and entry"
@@ -151,7 +151,7 @@ def create_journal():
             db.session.add(journal_submission)
             db.session.commit()
             journal_id = journal_submission.journal_id
-            return redirect(url_for('specific_journal_page', user_id=author, journal_id=journal_id))
+            return redirect(url_for('specific_journal_page', id=author, journal_id=journal_id))
 
     return render_template('create_journal_entry.html', form=form, message=error)
     # return render_template('journalv2.html', form=form, message=error)
@@ -172,15 +172,16 @@ def user_journal_list(id):
 
 
 @app.route('/journal/<id>/<journal_id>')
-def specific_journal_page(user_id, journal_id):
+@login_required
+def specific_journal_page(id, journal_id):
     journal = db.session.query(Journal).get(journal_id)
-    author = db.session.query(User).get(journal.author_id)
+    user = db.session.query(User).get(id)
     time = str(journal.time)[:5]
     if journal.deleted:
         return render_template('deleted_journal_entry.html', title="Entry not found")
     else:
         return render_template('journal_entry.html', title=journal.title, entry=journal.entry, date=journal.date,
-                               time=time, author=f"{author.first_name} {author.last_name}")
+                               time=time, author=f"{user.first_name}")
 
 
 @app.route('/journal/<id>/<journal_id>/edit', methods=["GET", "POST"])
