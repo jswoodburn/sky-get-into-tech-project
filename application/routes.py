@@ -3,7 +3,7 @@ from datetime import datetime
 
 import requests
 from flask import render_template, request, url_for
-from flask_login import current_user, login_required, logout_user, login_user
+from flask_login import current_user, login_required, logout_user, login_user, login_manager, user_logged_in
 # from google.auth.transport import requests
 import requests
 from sqlalchemy import exists
@@ -22,6 +22,10 @@ from application.models import User, Journal
 #     return user
 
 # ----------- ROUTES -----------------
+
+# @login_manager.user_loaded_from_request
+# def user_loader(user_id):
+#     return User.query.get(user_id)
 
 
 @app.route('/')
@@ -80,7 +84,7 @@ def callback():
     # Parse the tokens!
     client.parse_request_body_response(json.dumps(token_response.json()))
 
-    # Now that you have tokens (yay) let's find and hit the URL
+    # Now that you have tokens. let's find and hit the URL
     # from Google that gives you the user's profile information,
     # including their Google profile image and email
     userinfo_endpoint = google_provider_cfg["userinfo_endpoint"]
@@ -130,7 +134,11 @@ def logout():
 
 @app.route('/mindfulness')
 def mindfulness():
-    return render_template('mindfulness.html', title='Mindfulness')
+    if current_user.is_authenticated:
+        return render_template('mindfulness.html', title='Mindfulness', is_logged_in=True,
+                               first_name=f"{current_user.first_name}")
+    else:
+        return render_template('mindfulness.html', title='Mindfulness', is_logged_in=False)
 
 
 @app.route('/journal', methods=['GET', 'POST'])
@@ -141,12 +149,13 @@ def create_journal():
     if request.method == 'POST':
         title = form.title.data
         entry = form.entry.data
-        author = db.session.query(User).get(id)  # ---------------- PLACEHOLDER ----> REPLACE THIS WITH USER ID --------------------------
+        # author_id = db.session.query(User).get(id)
+        author_id = current_user.id
 
         if len(title) == 0 or len(entry) == 0:
             error = "Please supply a title and entry"
         else:
-            journal_submission = Journal(date=datetime.now().date(), time=datetime.now().time(), author_id=author,
+            journal_submission = Journal(date=datetime.now().date(), time=datetime.now().time(), author_id=author_id,
                                          entry=entry, title=title, deleted=False)
             db.session.add(journal_submission)
             db.session.commit()

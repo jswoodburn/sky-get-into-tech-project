@@ -1,3 +1,7 @@
 {% extends "layout.html" %} {% block body_content %}
+{% if is_logged_in %}
+    <p>Take the time to be mindful, {{first_name}}</p>
+{% else %}
 <p>Take the time to be mindful</p>
+{% endif %}
 {% endblock %}
