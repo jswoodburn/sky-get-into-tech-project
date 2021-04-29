@@ -1,3 +1,4 @@
+mysql
 flask_wtf
 WTForms>=2.3.3
 Flask>=1.1.2
@@ -15,5 +16,5 @@ virtualenv
 google>=3.0.0
 Auth
 GoogleApi
-pymysql
+
 
