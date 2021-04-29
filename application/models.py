@@ -16,14 +16,6 @@ class User(db.Model, UserMixin):
     def __repr__(self):
         return '<User %r>' % self.first_name
 
-    def is_active(self):
-        """True, as all users are active."""
-        return True
-
-    def get_id(self):
-        """Return the email address to satisfy Flask-Login's requirements."""
-        return self.email
-
 
 # Flask-Login helper to retrieve a user from our db
 @login_manager.user_loader
