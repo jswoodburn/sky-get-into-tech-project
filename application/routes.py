@@ -145,13 +145,13 @@ def mindfulness():
 def create_journal():
     error = ""
     form = JournalForm()
-
     if request.method == 'POST':
         title = form.title.data
         entry = form.entry.data
         # author_id = db.session.query(User).get(id)
         author_id = current_user.id
-
+        id = current_user.id
+        author = current_user.first_name
         if len(title) == 0 or len(entry) == 0:
             error = "Please supply a title and entry"
         else:
@@ -160,10 +160,12 @@ def create_journal():
             db.session.add(journal_submission)
             db.session.commit()
             journal_id = journal_submission.journal_id
-            return redirect(url_for('specific_journal_page', id=author, journal_id=journal_id))
-
-    return render_template('create_journal_entry.html', form=form, message=error)
-    # return render_template('journalv2.html', form=form, message=error)
+            return redirect(url_for('specific_journal_page', author=author, journal_id=journal_id, id=id))
+    if current_user.is_authenticated:
+        return render_template('create_journal_entry.html', form=form, message=error, is_logged_in=True)
+        # return render_template('journalv2.html', form=form, message=error)
+    else:
+        return render_template('create_journal_entry.html', form=form, message=error, is_logged_in=False)
 
 
 @app.route('/journal/<id>')
