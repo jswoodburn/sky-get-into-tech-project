@@ -53,4 +53,7 @@ distlib>=0.3.1
 filelock>=3.0.12
 appdirs>=1.4.4
 uritemplate>=3.0.1
-feedgen
+feedgen>=0.9.0
+lxml>=4.6.3
+python-dateutil>=2.8.1
+feedparser>=6.0.2

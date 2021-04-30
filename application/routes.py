@@ -114,26 +114,50 @@ def callback():
 
 @app.route('/impactfulmedia', methods=['GET'])
 def impactfulmedia():
-    fg = FeedGenerator()
-    fg.title('Good News')
-    fg.description('Feed description')
-    fg.link(href='https://www.goodnewsnetwork.org/category/news/feed/')
+    # fg = FeedGenerator()
+    # fg.title('Good News')
+    # fg.description('Feed description')
+    # fg.link(href='https://www.goodnewsnetwork.org/category/news/feed/')
+    #
+    # for article in get_news():  # returns a list of articles from somewhere
+    #     fe = fg.add_entry()
+    #     fe.title(article.title)
+    #     fe.link(href=article.url)
+    #     fe.description(article.content)
+    #     fe.guid(article.id, permalink=False)  # Or: fe.guid(article.url, permalink=True)
+    #     fe.author(name=article.author.name, email=article.author.email)
+    #     fe.pubDate(article.created_at)
+    #
+    # rssfeed = make_response(fg.rss_str())
+    # rssfeed.headers.set('Content-Type', 'application/rss+xml')
+    # rssfeed = fg.rss_str(pretty=True)
 
-    for article in impactfulmedia():  # returns a list of articles from somewhere
-        fe = fg.add_entry()
-        fe.title(article.title)
-        fe.link(href=article.url)
-        fe.description(article.content)
-        fe.guid(article.id, permalink=False)  # Or: fe.guid(article.url, permalink=True)
-        fe.author(name=article.author.name, email=article.author.email)
-        fe.pubDate(article.created_at)
+    def parseRSS(rss_url):
+        return feedparser.parse(rss_url)
 
-    rssfeed = make_response(fg.rss_str())
-    rssfeed.headers.set('Content-Type', 'application/rss+xml')
-    rssfeed = fg.rss_str(pretty=True)
+    def getHeadlines(rss_url):
+        headlines = []
 
+        feed = parseRSS(rss_url)
+        for newsitem in feed['items']:
+            headlines.append(newsitem['title'])
+
+        return headlines
+
+    allheadlines = []
+
+    newsurls = {
+
+        'Good News': 'https://www.goodnewsnetwork.org/category/news/feed/',
+
+    }
+
+    for key, url in newsurls.items():
+        allheadlines.extend(getHeadlines(url))
+    for hl in allheadlines:
+        print(hl)
     # return response
-    return render_template('impactfulmedia.html', title="Mindfulness", rssfeed=rssfeed)
+    return render_template('impactfulmedia.html', title="Mindfulness", rssfeed=rssfeed, response=response)
 
 
 @app.route('/mindfulness')
