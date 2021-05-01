@@ -11,12 +11,13 @@ from flask_login import current_user, login_required, logout_user, login_user, l
 # from google.auth.transport import requests
 import requests
 from sqlalchemy import exists
+from sqlalchemy.sql.expression import func, select
 from werkzeug.utils import redirect
 
 from application import app, db
 from application.__init__ import get_google_provider_cfg, client, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
 from application.forms.journalform import JournalForm
-from application.models import User, Journal
+from application.models import User, Journal, JournalTheme
 from datetime import datetime
 import tweepy
 from feedgen.feed import FeedGenerator
@@ -180,6 +181,7 @@ def create_journal():
         author_id = current_user.id
         id = current_user.id
         author = current_user.first_name
+
         if len(title) == 0 or len(entry) == 0:
             error = "Please supply a title and entry"
         else:
@@ -190,7 +192,8 @@ def create_journal():
             journal_id = journal_submission.journal_id
             return redirect(url_for('specific_journal_page', author=author, journal_id=journal_id, id=id))
     if current_user.is_authenticated:
-        return render_template('create_journal_entry.html', form=form, message=error, is_logged_in=True)
+        randomtheme = db.session.query(JournalTheme.theme).order_by(func.rand()).first()
+        return render_template('create_journal_entry.html', form=form, message=error, is_logged_in=True, randomtheme=randomtheme)
         # return render_template('journalv2.html', form=form, message=error)
     else:
         return render_template('create_journal_entry.html', form=form, message=error, is_logged_in=False)
@@ -199,7 +202,7 @@ def create_journal():
 @app.route('/journal/<id>')
 # need to add filter_by(deleted==False) or something so that don't get stuff that's been deleted
 def user_journal_list(id):
-    author_entries = db.session.query(Journal.journal_id).filter_by(author_id=1).order_by(Journal.date).order_by(
+    author_entries = db.session.query(Journal.journal_id).filter_by(author_id=id).order_by(Journal.date).order_by(
         Journal.time)
     titles_and_ids = []
     for id in author_entries:
