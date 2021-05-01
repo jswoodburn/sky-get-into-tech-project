@@ -119,11 +119,9 @@ def callback():
     # If user does not exist in db, create and add them to it
     # if not db.session.query(User.id).filter_by(google_id=google_uid):
     if not db.session.query(exists().where(User.google_id == google_uid)).scalar():
-        print("User does not exist")
         db.session.add(user)
         db.session.commit()
     else:
-        print("User does exist")
         user = db.session.query(User).filter_by(google_id=google_uid).first()
 
     # Begin user session by logging the user in
@@ -216,16 +214,15 @@ def user_journal_list(id):
 
 
 @app.route('/journal/<id>/<journal_id>')
-@login_required
 def specific_journal_page(id, journal_id):
     journal = db.session.query(Journal).get(journal_id)
     user = db.session.query(User).get(id)
     time = str(journal.time)[:5]
     if journal.deleted:
-        return render_template('deleted_journal_entry.html', title="Entry not found")
+        return render_template('deleted_journal_entry.html', title="Entry not found", is_logged_in=True)
     else:
         return render_template('journal_entry.html', title=journal.title, entry=journal.entry, date=journal.date,
-                               time=time, author=f"{user.first_name}")
+                               time=time, author=f"{user.first_name}", is_logged_in=True)
 
 
 @app.route('/journal/<id>/<journal_id>/edit', methods=["GET", "POST"])
