@@ -168,6 +168,44 @@ def mindfulness():
         return render_template('mindfulness.html', title='Mindfulness', is_logged_in=False)
 
 
+FEED_URL = 'https://www.goodnewsnetwork.org/category/news/feed/'
+
+
+@app.route('/impactfulmedia')
+def impactful_media():
+    f = feedparser.parse(FEED_URL)
+    # article = feed['entries']
+    # articletitle = article.get("title")
+    # description = article.get("description")
+    # articles = article, articletitle, description
+
+    # entries = f.entries
+    # for entry in f.entries:
+    #     print(entry.title)
+    #     print(entry.author)
+    for entry in f.entries:
+        articletitle = f.get("title")
+        description = f.get("description")
+        # articles = article, articletitle, description
+    articles = entry[0:5]
+
+    # return """<html>
+    # <body>
+    # <h1> Good News </h1>
+    # <b>{0}</b></br>
+    # <p>{1}</p></br>
+    # </body>
+    # </html>""".format(article.get("title"), article.get("description"))
+    if current_user.is_authenticated:
+        first_name = db.session.query(User).get(id)
+        return render_template('impactfulmedia.html', title='ImpactfulMedia', is_logged_in=True,
+                               first_name=f"{current_user.first_name}", article=article, articletitle=articletitle,
+                               description=description, articles=articles)
+
+    else:
+        return render_template('impactfulmedia.html', title='Home', is_logged_in=False)
+
+
 @app.route('/journal', methods=['GET', 'POST'])
 def create_journal():
     error = ""

@@ -1,12 +1,20 @@
 {% extends "layout.html" %} {% block body_content %}
 <p>A break from 'doomscrolling', there is still good happening in the world. </p>
-{% for response in rssfeed %}
-	  <div class="card mt-2">
-          <div class="card-text">
-              {{ response._json.text }}
-          </div>
-      </div>
-	  {% endfor %}
+ <body>
+ {% for article in articles%}
+     <h1> {articletitle} </h1>
+     <b>{article}</b></br>
+ <b>{description}</b></br>
+ {% endfor %}
+     <p></p></br>
+     </body>
+<!--{% for response in rssfeed %}-->
+<!--	  <div class="card mt-2">-->
+<!--          <div class="card-text">-->
+<!--              {{ response._json.text }}-->
+<!--          </div>-->
+<!--      </div>-->
+<!--	  {% endfor %}-->
 <!--<?xml version="1.0" encoding="utf-8"?>-->
 <!--<feed xmlns="https://www.goodnewsnetwork.org/category/news/feed/">-->
 <!--    <author>Author's name</author>-->
