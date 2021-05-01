@@ -1,3 +1,88 @@
 {% extends "layout.html" %} {% block body_content %}
-<p>This is the home page.</p>
+{% if is_logged_in %}
+    <p>Welcome back, {{first_name}}</p>
+{% endif %}
+<section container>
+
+  <section class="py-1 text-center container">
+    <div class="row py-lg-8">
+      <div class="col-lg-12 col-md-8 mx-auto">
+        <h1 class="fw-light">Create Meaningful Change In Your Digital Life</h1>
+      </div>
+    </div>
+  </section>
+
+
+
+<section class="layout-cards container">
+
+      <div class="row justify-content-center">
+
+        <div class="col-8 col-sm-12 col-lg-12">
+
+          <div class="card-deck">
+
+            <section class="card my-3">
+              <img class="layout-image card-img-top img-fluid" src="../static/reflect.png" alt="open book with pencil">
+              <div class="card-body">
+                <button onclick="document.location='journalv2.html'" class="btn btn-sm btn-outline-secondary">
+                    <h4 class="layout-title card-title">Reflect</h4>
+                    <p class="layout-text card-text">Take time to journal, publish yours and read entries from others</p>
+               </button>
+              </div>
+            </section>
+
+            <section class="card my-3">
+              <img class="layout-image card-img-top img-fluid" src="../static/discover.png" alt="newspaper and tablet">
+              <div class="card-body">
+                <button onclick="document.location='journalv2.html'" class="btn btn-sm btn-outline-secondary">
+                 <h4 class="layout-title card-title">Discover</h4>
+                 <p class="layout-text card-text">Have a break from doomscrolling. Read about some of the good in the world</p>
+                </button>
+              </div>
+            </section>
+
+
+
+            <section class="card my-3">
+              <img class="layout-image card-img-top img-fluid" src="../static/strengthen.png" alt="Person meditating in lotus pose">
+              <div class="card-body">
+                  <button onclick="document.location='default.asp'" class="btn btn-sm btn-outline-secondary">
+                     <h4 class="layout-title card-title">Strengthen</h4>
+                     <p class="layout-text card-text">Practice mindfulness, follow along with some of our activities.</p>
+                  </button>
+              </div>
+            </section>
+     <div class="w-100 d-none d-sm-block d-md-block d-lg-block d-xl-none"><!-- wrap every 2 on sm--></div>
+
+               <section class="card my-3">
+              <img class="layout-image card-img-top img-fluid" src="../static/relax.png" alt="empty bathtub with towel">
+              <div class="card-body">
+                  <button onclick="document.location='default.asp'" class="btn btn-sm btn-outline-secondary">
+                      <h4 class="layout-title card-title">Relax</h4>
+                      <p class="layout-text card-text">Prioritise self care, set goals for the time you will be spending away from a screen.</p>
+                  </button>
+              </div>
+            </section>
+
+
+               <section class="card my-3">
+              <img class="layout-image card-img-top img-fluid" src="../static/share.png" alt="open hand with light bulb hovering above">
+              <div class="card-body">
+                <button onclick="document.location='default.asp'" class="btn btn-sm btn-outline-secondary">
+                    <h4 class="layout-title card-title">Share</h4>
+                     <p class="layout-text card-text">Share what works for you, with the community. Hear what's working for others.</p>
+               </button>
+              </div>
+            </section>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section> <!--container-->
 {% endblock %}
+
+>>>>>>> main

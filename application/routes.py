@@ -2,8 +2,19 @@ from flask import render_template, request, url_for, make_response
 from flask_login import current_user
 from google.auth.transport import requests
 from application.__init__ import get_google_provider_cfg, client, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, login_manager
+import json
+from datetime import datetime
+
+import requests
+from flask import render_template, request, url_for
+from flask_login import current_user, login_required, logout_user, login_user, login_manager, user_logged_in
+# from google.auth.transport import requests
+import requests
+from sqlalchemy import exists
 from werkzeug.utils import redirect
+
 from application import app, db
+from application.__init__ import get_google_provider_cfg, client, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
 from application.forms.journalform import JournalForm
 from application.models import User, Journal
 from datetime import datetime
@@ -14,25 +25,27 @@ import feedparser
 
 # # Flask-Login helper to retrieve a user from our db
 # @login_manager.user_loader
-# def load_user(user_id):
-#     user = db.session.query(User).get(user_id)
+# def load_user(id):
+#     user = db.session.query(User).get(id)
 #     return user
 
 # ----------- ROUTES -----------------
+
+# @login_manager.user_loaded_from_request
+# def user_loader(user_id):
+#     return User.query.get(user_id)
 
 
 @app.route('/')
 @app.route('/home')
 def home():
-    # if current_user.is_authenticated:
-    #     user_id = current_user.id
-    #     user = db.session.query(User).get(user_id)
-    #     first_name = user.first_name
-    #     # return render_template('homepage.html', title='Home', is_logged_in=True, name=first_name)
-    #     return render_template('homepage.html', title='Home', is_logged_in=True)
-    #
-    # else:
-    return render_template('homepage.html', title='Home', is_logged_in=False)
+    if current_user.is_authenticated:
+        first_name = db.session.query(User).get(id)
+        return render_template('homepage.html', title='Home', is_logged_in=True,
+                               first_name=f"{current_user.first_name}")
+
+    else:
+        return render_template('homepage.html', title='Home', is_logged_in=False)
 
 
 @app.route('/login')
@@ -51,7 +64,7 @@ def login():
     return redirect(request_uri)
 
 
-@app.route("/login/callback")
+@app.route("/login/callback", methods=["POST", "GET"])
 def callback():
     # Get authorization code Google sent back to you
     code = request.args.get("code")
@@ -68,6 +81,7 @@ def callback():
         redirect_url=request.base_url,
         code=code
     )
+
     token_response = requests.post(
         token_url,
         headers=headers,
@@ -78,7 +92,7 @@ def callback():
     # Parse the tokens!
     client.parse_request_body_response(json.dumps(token_response.json()))
 
-    # Now that you have tokens (yay) let's find and hit the URL
+    # Now that you have tokens. let's find and hit the URL
     # from Google that gives you the user's profile information,
     # including their Google profile image and email
     userinfo_endpoint = google_provider_cfg["userinfo_endpoint"]
@@ -89,75 +103,41 @@ def callback():
     # The user authenticated with Google, authorized your
     # app, and now you've verified their email through Google!
     if userinfo_response.json().get("email_verified"):
-        unique_id = userinfo_response.json()["sub"]
+        google_uid = userinfo_response.json()["sub"]
         users_email = userinfo_response.json()["email"]
         picture = userinfo_response.json()["picture"]
         users_name = userinfo_response.json()["given_name"]
     else:
         return "User email not available or not verified by Google.", 400
 
+    # print(db.session.query(User.id).filter_by(google_id=google_uid))
+    user = User(
+        google_id=google_uid, first_name=users_name, email=users_email
+    )
+
     # If user does not exist in db, create and add them to it
-    if not db.session.query(User).get(unique_id):
-        names = users_name.split("")
-        user = User(user_id=unique_id, email=users_email, first_name=names[0], last_name=names[1])
+    # if not db.session.query(User.id).filter_by(google_id=google_uid):
+    if not db.session.query(exists().where(User.google_id == google_uid)).scalar():
+        print("User does not exist")
         db.session.add(user)
         db.session.commit()
     else:
-        user = db.session.query(User).get(unique_id)
+        print("User does exist")
+        user = db.session.query(User).filter_by(google_id=google_uid).first()
 
     # Begin user session by logging the user in
+
     login_user(user)
 
     # Send user back to homepage
-    return redirect(url_for("impactfulmedia"))
+    return redirect(url_for("home"))
 
 
-@app.route('/impactfulmedia', methods=['GET'])
-def impactfulmedia():
-    # fg = FeedGenerator()
-    # fg.title('Good News')
-    # fg.description('Feed description')
-    # fg.link(href='https://www.goodnewsnetwork.org/category/news/feed/')
-    #
-    # for article in get_news():  # returns a list of articles from somewhere
-    #     fe = fg.add_entry()
-    #     fe.title(article.title)
-    #     fe.link(href=article.url)
-    #     fe.description(article.content)
-    #     fe.guid(article.id, permalink=False)  # Or: fe.guid(article.url, permalink=True)
-    #     fe.author(name=article.author.name, email=article.author.email)
-    #     fe.pubDate(article.created_at)
-    #
-    # rssfeed = make_response(fg.rss_str())
-    # rssfeed.headers.set('Content-Type', 'application/rss+xml')
-    # rssfeed = fg.rss_str(pretty=True)
-
-    def parseRSS(rss_url):
-        return feedparser.parse(rss_url)
-
-    def getHeadlines(rss_url):
-        headlines = []
-
-        feed = parseRSS(rss_url)
-        for newsitem in feed['items']:
-            headlines.append(newsitem['title'])
-
-        return headlines
-
-    allheadlines = []
-
-    newsurls = {
-
-        'Good News': 'https://www.goodnewsnetwork.org/category/news/feed/',
-
-    }
-
-    for key, url in newsurls.items():
-        allheadlines.extend(getHeadlines(url))
-    for hl in allheadlines:
-        print(hl)
-    # return response
-    return render_template('impactfulmedia.html', title="Mindfulness", rssfeed=rssfeed, response=response)
+@app.route("/logout")
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for("home"))
 
 
 @app.route('/mindfulness')
@@ -182,63 +162,71 @@ def mindfulness():
                            q=search_words,
                            lang="en",
                            since=date_since).items(5)
-
-    return render_template('mindfulness.html', title='Mindfulness', tweets=tweets)
+    if current_user.is_authenticated:
+        return render_template('mindfulness.html', title='Mindfulness', is_logged_in=True,
+                               first_name=f"{current_user.first_name}", tweets=tweets)
+    else:
+        return render_template('mindfulness.html', title='Mindfulness', is_logged_in=False)
 
 
 @app.route('/journal', methods=['GET', 'POST'])
 def create_journal():
     error = ""
     form = JournalForm()
-
     if request.method == 'POST':
         title = form.title.data
         entry = form.entry.data
-        author = 1  # ---------------- PLACEHOLDER ----> REPLACE THIS WITH USER ID --------------------------
-
+        # author_id = db.session.query(User).get(id)
+        author_id = current_user.id
+        id = current_user.id
+        author = current_user.first_name
         if len(title) == 0 or len(entry) == 0:
             error = "Please supply a title and entry"
         else:
-            journal_submission = Journal(date=datetime.now().date(), time=datetime.now().time(), author_id=author,
+            journal_submission = Journal(date=datetime.now().date(), time=datetime.now().time(), author_id=author_id,
                                          entry=entry, title=title, deleted=False)
             db.session.add(journal_submission)
             db.session.commit()
             journal_id = journal_submission.journal_id
-            return redirect(url_for('specific_journal_page', user_id=author, journal_id=journal_id))
+            return redirect(url_for('specific_journal_page', author=author, journal_id=journal_id, id=id))
+    if current_user.is_authenticated:
+        return render_template('create_journal_entry.html', form=form, message=error, is_logged_in=True)
+        # return render_template('journalv2.html', form=form, message=error)
+    else:
+        return render_template('create_journal_entry.html', form=form, message=error, is_logged_in=False)
 
-    return render_template('create_journal_entry.html', form=form, message=error)
-    # return render_template('journalv2.html', form=form, message=error)
 
-
-@app.route('/journal/<user_id>')
+@app.route('/journal/<id>')
 # need to add filter_by(deleted==False) or something so that don't get stuff that's been deleted
-def user_journal_list(user_id):
+def user_journal_list(id):
     author_entries = db.session.query(Journal.journal_id).filter_by(author_id=1).order_by(Journal.date).order_by(
         Journal.time)
     titles_and_ids = []
     for id in author_entries:
         journal_id = id[0]
         entry = db.session.query(Journal).get(journal_id)
-        url = url_for('specific_journal_page', user_id=user_id, journal_id=journal_id)
+        url = url_for('specific_journal_page', id=id, journal_id=journal_id)
         titles_and_ids.append([entry.title, url])
-    return render_template('user_journals_list.html', title="Your Journal Entries", title_list=titles_and_ids)
+    return render_template('user_journals_list.html', title="Your Journal Entries", title_list=titles_and_ids,
+                           is_logged_in=True)
 
 
-@app.route('/journal/<user_id>/<journal_id>')
-def specific_journal_page(user_id, journal_id):
+@app.route('/journal/<id>/<journal_id>')
+@login_required
+def specific_journal_page(id, journal_id):
     journal = db.session.query(Journal).get(journal_id)
-    author = db.session.query(User).get(journal.author_id)
+    user = db.session.query(User).get(id)
     time = str(journal.time)[:5]
     if journal.deleted:
         return render_template('deleted_journal_entry.html', title="Entry not found")
     else:
         return render_template('journal_entry.html', title=journal.title, entry=journal.entry, date=journal.date,
-                               time=time, author=f"{author.first_name} {author.last_name}")
+                               time=time, author=f"{user.first_name}")
 
 
-@app.route('/journal/<user_id>/<journal_id>/edit', methods=["GET", "POST"])
-def edit_journal(user_id, journal_id):
-    # only people who's user ID matches the user_id should be able to access edit page
+@app.route('/journal/<id>/<journal_id>/edit', methods=["GET", "POST"])
+def edit_journal(journal_id):
+    # only people who's user ID matches the id should be able to access edit page
     # put in an if loop for this later when have user sessions
     # also add in a delete button that fills out deleted column
 
@@ -267,3 +255,13 @@ def edit_journal(user_id, journal_id):
     form.entry.data = journal_to_edit.entry
     return render_template('create_journal_entry.html', form=form, message=error)
     # return render_template('journalv2.html', form=form, message=error)
+
+
+@app.route('/profile', methods=['GET', 'POST'])
+@login_required
+def profile():
+    first_name = db.session.query(User).get(id)
+
+    return render_template('profile.html', first_name=f"{current_user.first_name}", is_logged_in=True)
+    # number_of_journals=number_of_journals,
+    # mindful_moments=mindful_moments)
