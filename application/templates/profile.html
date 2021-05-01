@@ -1,19 +1,24 @@
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 {% extends "layout.html" %} {% block body_content %}
 <div>
 
 
 </div>
 <h3> {{first_name}}'s Digital Health statistics this week</h3>
+<div class="row">
+  <div class="col-sm-4">
+      <p>Words written in journal:</p>
+  </div>
+  <div class="col-sm-4">
+      <p>Mindful moments spent:</p>
+  </div>
+  <div class="col-sm-4">
+      <p>Impactful Media read</p>
+  </div>
+</div>
 
-<p>Words written in journal:</p>
-</br>
-<p>Mindful moments spent:</p>
-</br>
-<p>Impactful Media read</p>
-</br>
-<p>A tip of the day for {{first_name}}</p>
-</br>
-<h2>Community engagement</h2>
-<p>Coming soon...</p>
+
+<h2>Community engagement <span class="label label-default">Coming Soon</span></h2>
+
 
 {% endblock %}

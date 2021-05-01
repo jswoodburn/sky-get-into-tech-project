@@ -193,7 +193,8 @@ def create_journal():
             return redirect(url_for('specific_journal_page', author=author, journal_id=journal_id, id=id))
     if current_user.is_authenticated:
         randomtheme = db.session.query(JournalTheme.theme).order_by(func.rand()).first()
-        return render_template('create_journal_entry.html', form=form, message=error, is_logged_in=True, randomtheme=randomtheme)
+        return render_template('create_journal_entry.html', form=form, message=error, is_logged_in=True,
+                               randomtheme=randomtheme[0])
         # return render_template('journalv2.html', form=form, message=error)
     else:
         return render_template('create_journal_entry.html', form=form, message=error, is_logged_in=False)
