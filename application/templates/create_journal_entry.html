@@ -2,7 +2,8 @@
 <div class="entry-form">
   <form action="" method="POST">
     {% if is_logged_in %}
-    <p>Suggested Journal Theme:</p>
+    <p>Journal Theme:</p>
+    <p class="label">A prompt to help you with your next journal entry</p>
     {% endif %}
     {{ form.hidden_tag() }} {{ form.title.label }} {{ form.title }}
     <br />
