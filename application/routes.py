@@ -266,3 +266,13 @@ def profile():
     return render_template('profile.html', first_name=f"{current_user.first_name}", is_logged_in=True)
     # number_of_journals=number_of_journals,
     # mindful_moments=mindful_moments)
+
+@app.route('/aboutus')
+def aboutus():
+    if current_user.is_authenticated:
+        first_name = db.session.query(User).get(id)
+        return render_template('aboutus.html', title='About Us', is_logged_in=True,
+                               first_name=f"{current_user.first_name}")
+
+    else:
+        return render_template('aboutus.html', title='About Us', is_logged_in=False)
