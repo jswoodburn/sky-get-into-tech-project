@@ -9,7 +9,7 @@ db.create_all()
 
 # input sample data here
 
-test_user_1 = User(google_id='101399590782175635333', email='jackie.woodburn@gmail.com',
+test_user_1 = User(google_id='101399590782175635333', email='random@gmail.com',
                    first_name='Jackie', last_name='Woodburn')
 
 # add and commit sample data to db here
