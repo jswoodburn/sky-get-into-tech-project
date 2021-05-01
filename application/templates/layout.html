@@ -40,11 +40,13 @@
             <a class="nav-link disabled" href="/community">Community</a>
           {% if is_logged_in %}
           <li class="nav-item active">
-            <a href="/profile">My profile</a>
+            <a class="nav-link" href="/profile">My Profile</a>
+            <li class="nav-item active">
+              <a type="button" href="/logout" class="btn btn-dark" role="button">Logout</a>
           </li>
           {% else %}
           <li class="nav-item active">
-            <a href="/login">Login</a>
+              <a type="button" class="btn btn-dark" href="/login">Login with Google</a>
           </li>
           {% endif %}
         </ul>

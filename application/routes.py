@@ -179,7 +179,8 @@ def user_journal_list(id):
         entry = db.session.query(Journal).get(journal_id)
         url = url_for('specific_journal_page', id=id, journal_id=journal_id)
         titles_and_ids.append([entry.title, url])
-    return render_template('user_journals_list.html', title="Your Journal Entries", title_list=titles_and_ids)
+    return render_template('user_journals_list.html', title="Your Journal Entries", title_list=titles_and_ids,
+                           is_logged_in=True)
 
 
 @app.route('/journal/<id>/<journal_id>')
@@ -233,6 +234,7 @@ def edit_journal(journal_id):
 def profile():
     first_name = db.session.query(User).get(id)
 
-    return render_template('profile.html', first_name=f"{current_user.first_name}")
+    return render_template('profile.html', first_name=f"{current_user.first_name}", is_logged_in=True)
                            # number_of_journals=number_of_journals,
                            # mindful_moments=mindful_moments)
+
