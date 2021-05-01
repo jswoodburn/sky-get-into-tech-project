@@ -1,3 +1,7 @@
+from flask import render_template, request, url_for, make_response
+from flask_login import current_user
+from google.auth.transport import requests
+from application.__init__ import get_google_provider_cfg, client, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, login_manager
 import json
 from datetime import datetime
 
@@ -7,12 +11,17 @@ from flask_login import current_user, login_required, logout_user, login_user, l
 # from google.auth.transport import requests
 import requests
 from sqlalchemy import exists
+from sqlalchemy.sql.expression import func, select
 from werkzeug.utils import redirect
 
 from application import app, db
 from application.__init__ import get_google_provider_cfg, client, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
 from application.forms.journalform import JournalForm
-from application.models import User, Journal
+from application.models import User, Journal, JournalTheme
+from datetime import datetime
+import tweepy
+from feedgen.feed import FeedGenerator
+import feedparser
 
 
 # # Flask-Login helper to retrieve a user from our db
@@ -134,9 +143,29 @@ def logout():
 
 @app.route('/mindfulness')
 def mindfulness():
+    auth = tweepy.OAuthHandler("VXNAakrOK2uorxArIJGWWLYlC", "ND4xneY9OboE4kQJe2IhhUwZdHb1qh366HiWVcGkCAAs9UghLv")
+    auth.set_access_token("1355474665972621316-dWfZkdGO6xLSpSDIn2khGc4V2l5j0Y",
+                          "sSnf7RrNQDVY2SBE5H5sO4qN0LJ7wscwGdmF6SizpG2XW")
+    api = tweepy.API(auth)
+
+    search = request.args.get('q')
+
+    public_tweets = api.user_timeline(search)
+    # Define the search term and the date_since date as variables
+    search_words = "#positivity"
+    date_since = "2021-03-03"
+    tweets = tweepy.Cursor(api.search,
+                           q=search_words,
+                           lang="en",
+                           since=date_since).items(5)
+
+    tweets = tweepy.Cursor(api.search,
+                           q=search_words,
+                           lang="en",
+                           since=date_since).items(5)
     if current_user.is_authenticated:
         return render_template('mindfulness.html', title='Mindfulness', is_logged_in=True,
-                               first_name=f"{current_user.first_name}")
+                               first_name=f"{current_user.first_name}", tweets=tweets)
     else:
         return render_template('mindfulness.html', title='Mindfulness', is_logged_in=False)
 
@@ -152,6 +181,7 @@ def create_journal():
         author_id = current_user.id
         id = current_user.id
         author = current_user.first_name
+
         if len(title) == 0 or len(entry) == 0:
             error = "Please supply a title and entry"
         else:
@@ -162,7 +192,9 @@ def create_journal():
             journal_id = journal_submission.journal_id
             return redirect(url_for('specific_journal_page', author=author, journal_id=journal_id, id=id))
     if current_user.is_authenticated:
-        return render_template('create_journal_entry.html', form=form, message=error, is_logged_in=True)
+        randomtheme = db.session.query(JournalTheme.theme).order_by(func.rand()).first()
+        return render_template('create_journal_entry.html', form=form, message=error, is_logged_in=True,
+                               randomtheme=randomtheme[0])
         # return render_template('journalv2.html', form=form, message=error)
     else:
         return render_template('create_journal_entry.html', form=form, message=error, is_logged_in=False)
@@ -171,7 +203,7 @@ def create_journal():
 @app.route('/journal/<id>')
 # need to add filter_by(deleted==False) or something so that don't get stuff that's been deleted
 def user_journal_list(id):
-    author_entries = db.session.query(Journal.journal_id).filter_by(author_id=1).order_by(Journal.date).order_by(
+    author_entries = db.session.query(Journal.journal_id).filter_by(author_id=id).order_by(Journal.date).order_by(
         Journal.time)
     titles_and_ids = []
     for id in author_entries:
@@ -235,6 +267,5 @@ def profile():
     first_name = db.session.query(User).get(id)
 
     return render_template('profile.html', first_name=f"{current_user.first_name}", is_logged_in=True)
-                           # number_of_journals=number_of_journals,
-                           # mindful_moments=mindful_moments)
-
+    # number_of_journals=number_of_journals,
+    # mindful_moments=mindful_moments)
