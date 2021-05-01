@@ -199,18 +199,21 @@ def create_journal():
 
 
 @app.route('/journal/<id>')
-# need to add filter_by(deleted==False) or something so that don't get stuff that's been deleted
 def user_journal_list(id):
-    author_entries = db.session.query(Journal.journal_id).filter_by(author_id=id).order_by(Journal.date).order_by(
-        Journal.time)
-    titles_and_ids = []
+    author_entries = db.session.query(Journal.journal_id).filter_by(author_id=user_id).filter_by(
+        deleted=False).order_by(desc(Journal.date)).order_by(desc(Journal.time))
+    journal_data = []
     for id in author_entries:
         journal_id = id[0]
         entry = db.session.query(Journal).get(journal_id)
         url = url_for('specific_journal_page', id=id, journal_id=journal_id)
-        titles_and_ids.append([entry.title, url])
-    return render_template('user_journals_list.html', title="Your Journal Entries", title_list=titles_and_ids,
-                           is_logged_in=True)
+        if len(entry.entry) > 50:
+            shortened_entry = entry.entry[:50] + "..."
+        else:
+            shortened_entry = entry.entry
+        journal_data.append([entry.title, url, entry.date, shortened_entry])
+    return render_template('user_journals_list.html', title="Your Journal Entries", title_list=journal_data, is_logged_in=True)
+
 
 
 @app.route('/journal/<id>/<journal_id>')
