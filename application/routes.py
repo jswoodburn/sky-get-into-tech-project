@@ -142,6 +142,19 @@ def logout():
 
 @app.route('/mindfulness')
 def mindfulness():
+
+    if current_user.is_authenticated:
+        return render_template('mindfulness.html', title='Mindfulness', is_logged_in=True,
+                               first_name=f"{current_user.first_name}")
+    else:
+        return render_template('mindfulness.html', title='Mindfulness', is_logged_in=False)
+
+
+FEED_URL = 'https://www.goodnewsnetwork.org/category/news/feed/'
+
+
+@app.route('/impactfulmedia')
+def impactful_media():
     auth = tweepy.OAuthHandler("VXNAakrOK2uorxArIJGWWLYlC", "ND4xneY9OboE4kQJe2IhhUwZdHb1qh366HiWVcGkCAAs9UghLv")
     auth.set_access_token("1355474665972621316-dWfZkdGO6xLSpSDIn2khGc4V2l5j0Y",
                           "sSnf7RrNQDVY2SBE5H5sO4qN0LJ7wscwGdmF6SizpG2XW")
@@ -163,75 +176,10 @@ def mindfulness():
                            lang="en",
                            since=date_since).items(5)
     if current_user.is_authenticated:
-        return render_template('mindfulness.html', title='Mindfulness', is_logged_in=True,
+        return render_template('impactfulmedia.html', title='Mindfulness', is_logged_in=True,
                                first_name=f"{current_user.first_name}", tweets=tweets)
     else:
-        return render_template('mindfulness.html', title='Mindfulness', is_logged_in=False)
-
-
-FEED_URL = 'https://www.goodnewsnetwork.org/category/news/feed/'
-
-
-@app.route('/impactfulmedia')
-def impactful_media():
-    pass
-    # @app.route('/rss')
-    # def rss():
-    #     nc = Newscatcher(website='goodnewsnetwork.org/category/news/feed/')
-    #     results = nc.get_news()
-    #     articles = results['articles']
-    #     print(articles)
-        # fg = FeedGenerator()
-        # fg.title('Feed title')
-        # fg.description('Feed description')
-        # fg.link(href='https://www.goodnewsnetwork.org/category/news/feed/')
-        #
-        # for article in get_news():  # get_news() returns a list of articles from somewhere
-        #     fe = fg.add_entry()
-        #     fe.title(article.title)
-        #     fe.link(href=article.url)
-        #     fe.description(article.content)
-        #     fe.guid(article.id, permalink=False)  # Or: fe.guid(article.url, permalink=True)
-        #     fe.author(name=article.author.name, email=article.author.email)
-        #     fe.pubDate(article.created_at)
-        #
-        # response = make_response(fg.rss_str())
-        # response.headers.set('Content-Type', 'application/rss+xml')
-
-
-    # article = feed['entries']
-    # articletitle = article.get("title")
-    # description = article.get("description")
-    # articles = article, articletitle, description
-
-    # entries = f.entries
-    # for entry in f.entries:
-    #     print(entry.title)
-    #     print(entry.author)
-
-
-    # for entry in f.entries:
-    #     articletitle = f.get("title")
-    #     description = f.get("description")
-    #     # articles = article, articletitle, description
-    # articles = entry[0:5]
-
-    # return """<html>
-    # <body>
-    # <h1> Good News </h1>
-    # <b>{0}</b></br>
-    # <p>{1}</p></br>
-    # </body>
-    # </html>""".format(article.get("title"), article.get("description"))
-    # if current_user.is_authenticated:
-    #     first_name = db.session.query(User).get(id)
-    #     return render_template('impactfulmedia.html', title='ImpactfulMedia', is_logged_in=True,
-    #                            first_name=f"{current_user.first_name}", response=response)
-    # # article=article, articletitle=articletitle,
-    # #                                description=description, articles=articles
-    #
-    # else:
-    #     return render_template('impactfulmedia.html', title='Home', is_logged_in=False)
+        return render_template('impactfulmedia.html', title='Mindfulness', is_logged_in=False)
 
 
 @app.route('/journal', methods=['GET', 'POST'])
