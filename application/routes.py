@@ -212,8 +212,8 @@ def user_journal_list(id):
         else:
             shortened_entry = entry.entry
         journal_data.append([entry.title, url, entry.date, shortened_entry])
-    return render_template('user_journals_list.html', title="Your Journal Entries", title_list=journal_data, is_logged_in=True)
-
+    return render_template('user_journals_list.html', title="Your Journal Entries", title_list=journal_data,
+                           is_logged_in=True)
 
 
 @app.route('/journal/<id>/<journal_id>')
@@ -269,6 +269,7 @@ def profile():
     return render_template('profile.html', first_name=f"{current_user.first_name}", is_logged_in=True)
     # number_of_journals=number_of_journals,
     # mindful_moments=mindful_moments)
+
 
 @app.route('/aboutus')
 def aboutus():
