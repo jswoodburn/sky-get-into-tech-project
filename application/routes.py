@@ -26,20 +26,7 @@ import feedparser
 from application.exceptions.PageNotFound import PageNotFoundError
 from application.exceptions.RequiresLogin import PageRequiresLoginError
 from application.exceptions.PageDeletedError import PageDeletedError
-
-
-# # Flask-Login helper to retrieve a user from our db
-# @login_manager.user_loader
-# def load_user(id):
-#     user = db.session.query(User).get(id)
-#     return user
-
-# ----------- ROUTES -----------------
-
-# @login_manager.user_loaded_from_request
-# def user_loader(user_id):
-#     return User.query.get(user_id)
-
+from application.exceptions.UserPermissionsDenied import PermissionsDeniedError
 
 @app.route('/')
 @app.route('/home')
@@ -179,9 +166,7 @@ def create_journal():
     if request.method == 'POST':
         title = form.title.data
         entry = form.entry.data
-        # author_id = db.session.query(User).get(id)
         author_id = current_user.id
-        id = current_user.id
         author = current_user.first_name
 
         if len(title) == 0 or len(entry) == 0:
@@ -192,14 +177,13 @@ def create_journal():
             db.session.add(journal_submission)
             db.session.commit()
             journal_id = journal_submission.journal_id
-            return redirect(url_for('specific_journal_page', author=author, journal_id=journal_id, user_id=id))
+            return redirect(url_for('specific_journal_page', journal_id=journal_id, user_id=author_id))
     if current_user.is_authenticated:
         randomtheme = db.session.query(JournalTheme.theme).order_by(func.rand()).first()
         return render_template('create_journal_entry.html', form=form, message=error, is_logged_in=True,
-                               randomtheme=randomtheme[0])
-        # return render_template('journalv2.html', form=form, message=error)
+                               randomtheme=randomtheme[0], is_edit=False)
     else:
-        return render_template('create_journal_entry.html', form=form, message=error, is_logged_in=False)
+        raise PageRequiresLoginError("User tried to access journal creation page without logging in.")
 
 
 @app.route('/journal/<user_id>')
@@ -234,16 +218,23 @@ def specific_journal_page(user_id, journal_id):
                                f"the public.")
     else:
         time = str(journal_entry.time_created)[:5]
+        can_edit = False
+        if current_user.is_authenticated:
+            print(current_user.id, user_id)
+
+            if int(current_user.id) == int(user_id):
+                can_edit = True
+
+        print(can_edit)
+
         return render_template('journal_entry.html', title=journal_entry.title, entry=journal_entry.entry,
                                date=journal_entry.date_created, time=time, author=f"{user.first_name}",
-                               index_url=f"/journal/{user_id}", is_logged_in=True)
+                               index_url=f"/journal/{user_id}", is_logged_in=True, can_edit=can_edit,
+                               edit_url=f"/journal/{user_id}-{journal_id}-edit")
 
 
 @app.route('/journal/<user_id>-<journal_id>-edit', methods=["GET", "POST"])
 def edit_journal(user_id, journal_id):
-    # only people who's user ID matches the id should be able to access edit page
-    # put in an if loop for this later when have user sessions
-    # also add in a delete button that fills out deleted column
 
     error = ""
 
@@ -266,11 +257,25 @@ def edit_journal(user_id, journal_id):
             author_id = journal_to_edit.author_id
             return redirect(url_for('specific_journal_page', user_id=author_id, journal_id=journal_id))
 
-    form.title.data = journal_to_edit.title
-    form.entry.data = journal_to_edit.entry
-    return render_template('create_journal_entry.html', form=form, message=error)
-    # return render_template('journalv2.html', form=form, message=error)
-
+    if not journal_to_edit:
+        raise PageNotFoundError(f"The user has tried to access journal ID {journal_id} which does not exist in the "
+                                f"database.")
+    elif int(journal_to_edit.author_id) != int(user_id):
+        raise PageNotFoundError(f"The journal ID {journal_id} does not exist for the user ID {user_id}.")
+    elif journal_to_edit.deleted:
+        raise PageDeletedError(f"The journal ID {journal_id} was soft-deleted by the user and cannot be accessed by "
+                               f"the public.")
+    elif current_user.is_authenticated:
+        if int(user_id) != int(current_user.id):
+            raise PermissionsDeniedError(f"User with ID {current_user.id} tried to access edit page for entry "
+                                         f"{journal_id} by user with ID {user_id}")
+        else:
+            form.title.data = journal_to_edit.title
+            form.entry.data = journal_to_edit.entry
+            return render_template('create_journal_entry.html', form=form, message=error, is_logged_in=True,
+                                   randomtheme="", is_edit=True)
+    else:
+        raise PageRequiresLoginError("User tried to access journal edit page without logging in.")
 
 @app.route('/profile', methods=['GET', 'POST'])
 @login_required
@@ -310,6 +315,12 @@ def page_deleted(err):
     app.logger.exception(err)
     return render_template('generic_exception_page.html', message="Sorry, this journal entry has been deleted.",
     sub_message="", is_logged_in=False)
+
+@app.errorhandler(PermissionsDeniedError)
+def page_deleted(err):
+    app.logger.exception(err)
+    return render_template('generic_exception_page.html', message="You do not have permission to access this page.",
+    sub_message="You must be logged in as the owner of this page to access it.", is_logged_in=False)
 
 @app.errorhandler(500)
 @app.errorhandler(Exception)

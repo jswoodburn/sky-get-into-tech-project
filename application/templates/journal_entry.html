@@ -7,4 +7,12 @@
 <div>
     <h5>Posted by <a href={{index_url}}>{{author}}</a> on {{date}} at {{time}}</h5>
 </div>
+{% if can_edit %}
+    <div>
+        <button>
+            <a href={{edit_url}}>Edit Entry</a>
+        </button>
+    </div>
+{% endif %}
+
 {% endblock %}
