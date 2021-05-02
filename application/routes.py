@@ -10,7 +10,7 @@ from flask import render_template, request, url_for
 from flask_login import current_user, login_required, logout_user, login_user, login_manager, user_logged_in
 # from google.auth.transport import requests
 import requests
-from sqlalchemy import exists
+from sqlalchemy import exists, desc
 from sqlalchemy.sql.expression import func, select
 from werkzeug.utils import redirect
 
