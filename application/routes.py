@@ -24,6 +24,10 @@ import tweepy
 # from newscatcher import Newscatcher
 # import feedparser
 
+from application.exceptions.PageNotFound import PageNotFoundError
+from application.exceptions.RequiresLogin import PageRequiresLoginError
+from application.exceptions.PageDeletedError import PageDeletedError
+
 
 # # Flask-Login helper to retrieve a user from our db
 # @login_manager.user_loader
@@ -195,14 +199,14 @@ def create_journal():
         author = current_user.first_name
 
         if len(title) == 0 or len(entry) == 0:
-            error = "Please supply a title and entry"
+            error = "Please supply a title and entry."
         else:
-            journal_submission = Journal(date=datetime.now().date(), time=datetime.now().time(), author_id=author_id,
-                                         entry=entry, title=title, deleted=False)
+            journal_submission = Journal(date_created=datetime.now().date(), time_created=datetime.now().time(),
+                                         author_id=author_id, entry=entry, title=title, deleted=False)
             db.session.add(journal_submission)
             db.session.commit()
             journal_id = journal_submission.journal_id
-            return redirect(url_for('specific_journal_page', author=author, journal_id=journal_id, id=id))
+            return redirect(url_for('specific_journal_page', author=author, journal_id=journal_id, user_id=id))
     if current_user.is_authenticated:
         randomtheme = db.session.query(JournalTheme.theme).order_by(func.rand()).first()
         return render_template('create_journal_entry.html', form=form, message=error, is_logged_in=True,
@@ -212,38 +216,45 @@ def create_journal():
         return render_template('create_journal_entry.html', form=form, message=error, is_logged_in=False)
 
 
-@app.route('/journal/<id>')
-def user_journal_list(id):
-    author_entries = db.session.query(Journal.journal_id).filter_by(author_id=id).filter_by(
-        deleted=False).order_by(desc(Journal.date)).order_by(desc(Journal.time))
+@app.route('/journal/<user_id>')
+def user_journal_list(user_id):
+    author_entries = db.session.query(Journal.journal_id).filter_by(author_id=user_id).filter_by(
+        deleted=False).order_by(desc(Journal.date_created)).order_by(desc(Journal.time_created))
     journal_data = []
-    for id in author_entries:
-        journal_id = id[0]
+    for journal_entry in author_entries:
+        journal_id = journal_entry[0]
         entry = db.session.query(Journal).get(journal_id)
-        url = url_for('specific_journal_page', id=id, journal_id=journal_id)
+        url = url_for('specific_journal_page', user_id=user_id, journal_id=journal_id)
         if len(entry.entry) > 50:
             shortened_entry = entry.entry[:50] + "..."
         else:
             shortened_entry = entry.entry
-        journal_data.append([entry.title, url, entry.date, shortened_entry])
+        journal_data.append([entry.title, url, entry.date_created, shortened_entry])
     return render_template('user_journals_list.html', title="Your Journal Entries", title_list=journal_data,
                            is_logged_in=True)
 
 
-@app.route('/journal/<id>/<journal_id>')
-def specific_journal_page(id, journal_id):
-    journal = db.session.query(Journal).get(journal_id)
-    user = db.session.query(User).get(id)
-    time = str(journal.time)[:5]
-    if journal.deleted:
-        return render_template('deleted_journal_entry.html', title="Entry not found", is_logged_in=True)
+@app.route('/journal/<user_id>-<journal_id>')
+def specific_journal_page(user_id, journal_id):
+    journal_entry = db.session.query(Journal).get(journal_id)
+    user = db.session.query(User).get(user_id)
+    if not journal_entry:
+        raise PageNotFoundError(f"The user has tried to access journal ID {journal_id} which does not exist in the "
+                                f"database.")
+    elif int(journal_entry.author_id) != int(user_id):
+        raise PageNotFoundError(f"The journal ID {journal_id} does not exist for the user ID {user_id}.")
+    elif journal_entry.deleted:
+        raise PageDeletedError(f"The journal ID {journal_id} was soft-deleted by the user and cannot be accessed by "
+                               f"the public.")
     else:
-        return render_template('journal_entry.html', title=journal.title, entry=journal.entry, date=journal.date,
-                               time=time, author=f"{user.first_name}", is_logged_in=True)
+        time = str(journal_entry.time_created)[:5]
+        return render_template('journal_entry.html', title=journal_entry.title, entry=journal_entry.entry,
+                               date=journal_entry.date_created, time=time, author=f"{user.first_name}",
+                               index_url=f"/journal/{user_id}", is_logged_in=True)
 
 
-@app.route('/journal/<id>/<journal_id>/edit', methods=["GET", "POST"])
-def edit_journal(journal_id):
+@app.route('/journal/<user_id>-<journal_id>-edit', methods=["GET", "POST"])
+def edit_journal(user_id, journal_id):
     # only people who's user ID matches the id should be able to access edit page
     # put in an if loop for this later when have user sessions
     # also add in a delete button that fills out deleted column
@@ -294,3 +305,30 @@ def aboutus():
 
     else:
         return render_template('aboutus.html', title='About Us', is_logged_in=False)
+
+@app.errorhandler(404)
+@app.errorhandler(PageNotFoundError)
+def page_does_not_exist(err):
+    app.logger.exception(err)
+    return render_template('generic_exception_page.html', message="The page you are looking for does not exist.",
+    sub_message="Please check the URL and try again.", is_logged_in=False)
+
+@app.errorhandler(PageRequiresLoginError)
+def page_requires_login(err):
+    app.logger.exception(err)
+    return render_template('generic_exception_page.html', message="You must log in to access this page.",
+    sub_message="", is_logged_in=False)
+
+@app.errorhandler(PageDeletedError)
+def page_deleted(err):
+    app.logger.exception(err)
+    return render_template('generic_exception_page.html', message="Sorry, this journal entry has been deleted.",
+    sub_message="", is_logged_in=False)
+
+@app.errorhandler(500)
+@app.errorhandler(Exception)
+def something_wrong(err):
+    app.logger.exception(err)
+    return render_template('generic_exception_page.html', message="Oops, something has gone wrong.",
+    sub_message="Please try refreshing the page or come back later. Our engineers are hard at work to fix the "
+                "problem.", is_logged_in=False)

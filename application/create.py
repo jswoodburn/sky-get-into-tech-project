@@ -18,10 +18,12 @@ db.session.add(test_user_1)
 db.session.commit()
 
 # input sample data here
-test_journal_1 = Journal(date=datetime.now().date(), time=datetime.now().time(), author_id=1, entry="This is a test "
+test_journal_1 = Journal(date_created=datetime.now().date(), time_created=datetime.now().time(), author_id=1,
+                         entry="This is a test "
                                                                                                     "entry.",
                          title="Test Entry", deleted=False)
-test_journal_2 = Journal(date=datetime.now().date(), time=datetime.now().time(), author_id=1, entry="This is a test "
+test_journal_2 = Journal(date_created=datetime.now().date(), time_created=datetime.now().time(), author_id=1,
+                         entry="This is a test "
                                                                                                     "entry. It should "
                                                                                                     "register as "
                                                                                                     "deleted",

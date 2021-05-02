@@ -1,0 +1,2 @@
+class PageDeletedError(Exception):
+    pass

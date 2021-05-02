@@ -1,9 +1,10 @@
 {% extends "layout.html" %}
 {% block body_content %}
 <div>
-<p>{{entry}}</p>
-    </div>
+    <h2>{{title}}</h2>
+    <p>{{entry}}</p>
+</div>
 <div>
-<h3>Posted by {{author}} on {{date}} at {{time}}</h3>
+    <h5>Posted by <a href={{index_url}}>{{author}}</a> on {{date}} at {{time}}</h5>
 </div>
 {% endblock %}
