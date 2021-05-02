@@ -234,8 +234,9 @@ def specific_journal_page(user_id, journal_id):
                                f"the public.")
     else:
         time = str(journal_entry.time_created)[:5]
-        return render_template('journal_entry.html', title=journal_entry.title, entry=journal_entry.entry, date=journal_entry.date_created,
-                               time=time, author=f"{user.first_name}", is_logged_in=True)
+        return render_template('journal_entry.html', title=journal_entry.title, entry=journal_entry.entry,
+                               date=journal_entry.date_created, time=time, author=f"{user.first_name}",
+                               index_url=f"/journal/{user_id}", is_logged_in=True)
 
 
 @app.route('/journal/<user_id>-<journal_id>-edit', methods=["GET", "POST"])
