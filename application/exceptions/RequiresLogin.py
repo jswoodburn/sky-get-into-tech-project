@@ -1,0 +1,2 @@
+class PageRequiresLoginError(Exception):
+    pass
