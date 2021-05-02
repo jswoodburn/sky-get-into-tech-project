@@ -27,9 +27,8 @@
         <img src="../static/digital_health_logo.png" style="width: 140px;" alt="Digital health logo">
 
         <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
-          <li class="nav-item active">
-            <a class="nav-link" href="/home">Home <span class="sr-only">(current)</span></a>
-          </li>
+          <li class="nav-item">
+           <a class="nav-link" href="/home">Home <span class="sr-only">(current)</span></a>
           <li class="nav-item">
             <a class="nav-link" href="/journal">Journal</a>
            <li class="nav-item">
@@ -39,13 +38,13 @@
           <li class="nav-item">
             <a class="nav-link disabled" href="/community">Community</a>
           {% if is_logged_in %}
-          <li class="nav-item active">
+          <li class="nav-item">
             <a class="nav-link" href="/profile">My Profile</a>
-            <li class="nav-item active">
+            <li class="nav-item">
               <a type="button" href="/logout" class="btn btn-dark" role="button">Logout</a>
           </li>
           {% else %}
-          <li class="nav-item active">
+          <li class="nav-item">
               <a type="button" class="btn btn-dark" href="/login">Login with Google</a>
           </li>
           {% endif %}
@@ -58,7 +57,7 @@
     </nav>
   </header>
 
-  <h1>{{title}}</h1>
+<!--  <h1>{{title}}</h1>-->
   {% block body_content %}{% endblock %}
 
 <!--Sticky footer with social media links-->

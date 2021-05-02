@@ -61,4 +61,5 @@ feedparser>=6.0.2
 Auth
 GoogleApi
 tweepy
+flask_bootstrap
 
