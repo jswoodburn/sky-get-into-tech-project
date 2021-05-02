@@ -181,7 +181,7 @@ def create_journal():
     if current_user.is_authenticated:
         randomtheme = db.session.query(JournalTheme.theme).order_by(func.rand()).first()
         return render_template('create_journal_entry.html', form=form, message=error, is_logged_in=True,
-                               randomtheme=randomtheme[0], is_edit=False)
+                               randomtheme=randomtheme[0], is_edit=False, delete_url="")
     else:
         raise PageRequiresLoginError("User tried to access journal creation page without logging in.")
 
@@ -273,9 +273,26 @@ def edit_journal(user_id, journal_id):
             form.title.data = journal_to_edit.title
             form.entry.data = journal_to_edit.entry
             return render_template('create_journal_entry.html', form=form, message=error, is_logged_in=True,
-                                   randomtheme="", is_edit=True)
+                                   randomtheme="", is_edit=True, delete_url=f"/journal/{user_id}-{journal_id}-delete")
     else:
         raise PageRequiresLoginError("User tried to access journal edit page without logging in.")
+
+
+@app.route('/journal/<user_id>-<journal_id>-delete', methods=["POST"])
+def delete_journal(user_id, journal_id):
+    if current_user.is_authenticated:
+        if int(user_id) != int(current_user.id):
+            raise PermissionsDeniedError(f"User with ID {current_user.id} tried to delete entry "
+                                         f"{journal_id} by user with ID {user_id}.")
+        else:
+            journal_to_delete = db.session.query(Journal).get(journal_id)
+            journal_to_delete.deleted = True
+            db.session.add(journal_to_delete)
+            db.session.commit()
+            return redirect(url_for('user_journal_list', user_id=user_id))
+    else:
+        raise PageRequiresLoginError("User tried to access journal deletion without logging in.")
+
 
 @app.route('/profile', methods=['GET', 'POST'])
 @login_required
