@@ -224,3 +224,8 @@ body {
           font-size: 3.5rem;
         }
       }
+
+.journalform{
+ form-control;
+ "d-flex justify-content-center";
+}

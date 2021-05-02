@@ -15,5 +15,7 @@ virtualenv
 google>=3.0.0
 Auth
 GoogleApi
+wtforms.validators
+flask_bootstrap
 
 
