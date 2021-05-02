@@ -178,7 +178,7 @@ def impactful_media():
     tweets = tweepy.Cursor(api.search,
                            q=search_words,
                            lang="en",
-                           since=date_since).items(5)
+                           since=date_since).items(20)
     if current_user.is_authenticated:
         return render_template('impactfulmedia.html', title='Mindfulness', is_logged_in=True,
                                first_name=f"{current_user.first_name}", tweets=tweets)
