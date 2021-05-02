@@ -200,7 +200,7 @@ def create_journal():
 
 @app.route('/journal/<id>')
 def user_journal_list(id):
-    author_entries = db.session.query(Journal.journal_id).filter_by(author_id=user_id).filter_by(
+    author_entries = db.session.query(Journal.journal_id).filter_by(author_id=id).filter_by(
         deleted=False).order_by(desc(Journal.date)).order_by(desc(Journal.time))
     journal_data = []
     for id in author_entries:
