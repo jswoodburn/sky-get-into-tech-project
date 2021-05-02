@@ -1,4 +1,6 @@
 import unittest
+from newscatcher import Newscatcher
+
 
 def get_long_string(number, word):
     lastletter = word[-1]
@@ -9,15 +11,15 @@ def get_long_string(number, word):
 
 class TestJournalMethod(unittest.TestCase):
     def test_get_long_string(self):
-        #Arrange
+        # Arrange
         word = 'hello'
         number = -5
         expected_response = 'hello'
 
-        #Act
+        # Act
         response = get_long_string(number, word)
 
-        #Assert
+        # Assert
         self.assertEqual(response, expected_response)
         # self.assertTrue(len(response) > len(word))
         self.assertEqual(len(response), len(word) + number)

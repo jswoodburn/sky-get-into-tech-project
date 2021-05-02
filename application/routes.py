@@ -20,8 +20,9 @@ from application.forms.journalform import JournalForm
 from application.models import User, Journal, JournalTheme
 from datetime import datetime
 import tweepy
-from feedgen.feed import FeedGenerator
-import feedparser
+# from feedgen.feed import FeedGenerator
+# from newscatcher import Newscatcher
+# import feedparser
 
 
 # # Flask-Login helper to retrieve a user from our db
@@ -173,7 +174,31 @@ FEED_URL = 'https://www.goodnewsnetwork.org/category/news/feed/'
 
 @app.route('/impactfulmedia')
 def impactful_media():
-    f = feedparser.parse(FEED_URL)
+    pass
+    # @app.route('/rss')
+    # def rss():
+    #     nc = Newscatcher(website='goodnewsnetwork.org/category/news/feed/')
+    #     results = nc.get_news()
+    #     articles = results['articles']
+    #     print(articles)
+        # fg = FeedGenerator()
+        # fg.title('Feed title')
+        # fg.description('Feed description')
+        # fg.link(href='https://www.goodnewsnetwork.org/category/news/feed/')
+        #
+        # for article in get_news():  # get_news() returns a list of articles from somewhere
+        #     fe = fg.add_entry()
+        #     fe.title(article.title)
+        #     fe.link(href=article.url)
+        #     fe.description(article.content)
+        #     fe.guid(article.id, permalink=False)  # Or: fe.guid(article.url, permalink=True)
+        #     fe.author(name=article.author.name, email=article.author.email)
+        #     fe.pubDate(article.created_at)
+        #
+        # response = make_response(fg.rss_str())
+        # response.headers.set('Content-Type', 'application/rss+xml')
+
+
     # article = feed['entries']
     # articletitle = article.get("title")
     # description = article.get("description")
@@ -183,11 +208,13 @@ def impactful_media():
     # for entry in f.entries:
     #     print(entry.title)
     #     print(entry.author)
-    for entry in f.entries:
-        articletitle = f.get("title")
-        description = f.get("description")
-        # articles = article, articletitle, description
-    articles = entry[0:5]
+
+
+    # for entry in f.entries:
+    #     articletitle = f.get("title")
+    #     description = f.get("description")
+    #     # articles = article, articletitle, description
+    # articles = entry[0:5]
 
     # return """<html>
     # <body>
@@ -196,14 +223,15 @@ def impactful_media():
     # <p>{1}</p></br>
     # </body>
     # </html>""".format(article.get("title"), article.get("description"))
-    if current_user.is_authenticated:
-        first_name = db.session.query(User).get(id)
-        return render_template('impactfulmedia.html', title='ImpactfulMedia', is_logged_in=True,
-                               first_name=f"{current_user.first_name}", article=article, articletitle=articletitle,
-                               description=description, articles=articles)
-
-    else:
-        return render_template('impactfulmedia.html', title='Home', is_logged_in=False)
+    # if current_user.is_authenticated:
+    #     first_name = db.session.query(User).get(id)
+    #     return render_template('impactfulmedia.html', title='ImpactfulMedia', is_logged_in=True,
+    #                            first_name=f"{current_user.first_name}", response=response)
+    # # article=article, articletitle=articletitle,
+    # #                                description=description, articles=articles
+    #
+    # else:
+    #     return render_template('impactfulmedia.html', title='Home', is_logged_in=False)
 
 
 @app.route('/journal', methods=['GET', 'POST'])

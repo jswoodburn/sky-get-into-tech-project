@@ -1,9 +1,31 @@
-{% extends "layout.html" %} {% block body_content %}
+{% extends "layout.html" %}
+{% block body_content %}
 {% if is_logged_in %}
     <p>Take the time to be mindful, {{first_name}}</p>
+<!--GIF-->
+
 {% else %}
 <p>Take the time to be mindful</p>
+		<div class="row">
+			<div class="col-sm-4">
+<!--GIF-->
+<div class="row">
+	<button type="button" class="btn btn-secondary" onclick="togglePicture()">Start Mindful Breathing</button>
+	<div id="mindfulimg">
+
+<img style="display:none;" id="breathing" src="../static/breathing.gif" width="480px" height="480px"/>
+	</div>
+</div>
+<!--	Audio-->
+
+<button class="btn btn-secondary" onclick="toggleAudio()">Play Guided Body Scan</button>
+<audio id="audio" src="https://palousemindfulness.com/disks/bodyscan20min.mp3"></audio>
+				<audio src="https://palousemindfulness.com/disks/bodyscan20min.mp3" id="audio"></audio>
+<i class="glyphicon glyphicon-play-circle b-play" id="play" onclick="play()"></i>
+			</div>
+		</div>
 {% endif %}
+
 <head>
 	<title>Mindfulness</title>
 	<link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css">
