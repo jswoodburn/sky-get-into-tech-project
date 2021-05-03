@@ -19,20 +19,20 @@ class User(db.Model, UserMixin):
 
 # Flask-Login helper to retrieve a user from our db
 @login_manager.user_loader
-def load_user(id):
-    user = db.session.query(User).get(id)
+def load_user(user_id):
+    user = db.session.query(User).get(user_id)
     return user
 
 
 class Journal(db.Model):
     __table_args__ = {'extend_existing': True}
     journal_id = db.Column('journal_id', db.Integer, primary_key=True, nullable=False)
-    date_created = db.Column('date_created', db.Date, nullable=False, default=datetime.utcnow())
-    time_created = db.Column('time_created', db.Time, nullable=False, default=datetime.utcnow())
+    date_created = db.Column('date_created', db.Date, nullable=False)
+    time_created = db.Column('time_created', db.Time, nullable=False)
     author_id = db.Column('author_id', db.Integer, db.ForeignKey(User.id), nullable=False)
     entry = db.Column('journal_entry', db.String(3000), nullable=False)
     title = db.Column('journal_title', db.String(200), nullable=False)
-    deleted = db.Column('deleted', db.Boolean, nullable=False)
+    deleted = db.Column('deleted', db.Boolean, nullable=False, default=False)
 
 
 class JournalTheme(db.Model):

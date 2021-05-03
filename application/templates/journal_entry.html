@@ -1,10 +1,17 @@
-{% extends "layout.html" %}
-{% block body_content %}
+{% extends "layout.html" %} {% block body_content %}
 <div>
-    <h2>{{title}}</h2>
-    <p>{{entry}}</p>
+  <h2>{{title}}</h2>
+  <p>{{entry}}</p>
 </div>
 <div>
-    <h5>Posted by <a href={{index_url}}>{{author}}</a> on {{date}} at {{time}}</h5>
+  <h5>
+    Posted by <a href="{{index_url}}">{{author}}</a> on {{date}} at {{time}}
+  </h5>
 </div>
-{% endblock %}
+{% if can_edit %}
+<div>
+  <button type="button" class="btn btn-dark">
+    <a href="{{edit_url}}">Edit Entry</a>
+  </button>
+</div>
+{% endif %} {% endblock %}
