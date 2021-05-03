@@ -11,20 +11,26 @@
 <p>Please log in to track your engagement</p>
 {% endif %}
 <body>
-
+<div class="card-group container">
+	<div class="row">
 	{% for entry in feed.entries %}
-	<div class="card-deck">
-  <div class="card">
-    <img class="card-img-top img-thumbnail" src="{{entry.media_content[0]['url']}}" alt="Card image cap">
-    <div class="card-body">
-      <h5 class="card-title">{{entry.title}}</h5>
-      <p class="card-text">{{entry.summary[3:350]}}...</p>
-      <a href="{{entry.link}}" class="btn btn-primary">Read more</a>
+  <div class="card col-sm">
+    <img class="card-img-top  col-sm" src="{{entry.media_content[0]['url']}}"
+		 alt="Card image cap">
+    <div class="card-body col-sm">
+      <h5 class="card-title col-sm">{{entry.title}}</h5>
+      <p class="card-text col-sm">{{entry.summary[3:300]}}...</p>
+      <a href="{{entry.link}}" class="btn btn-primary card-text col-sm">Read more</a>
     </div>
   </div>
+</div>
 	  {% endfor %}
   </div>
+</div>
 
+<div class="card-group container">
+	<div class="row">
+<div class="card-deck">
 	  {% for tweet in tweets %}
 	  <div class="card mt-2">
 	    <div class="card-body">
@@ -35,25 +41,10 @@
 	  </div>
 	  {% endfor %}
 	  <div>
-
-<!--{% for entry in feed.entries %}-->
-<!--		  <div class="row">-->
-<!--  <div class="col-sm-6">-->
-<!--		  <div class="card" style="width: 18rem;">-->
-<!--  <img class="card-img-top" src="{{entry.media_content[0]['url']}}" alt="good news image">-->
-<!--  <div class="card-body">-->
-<!--    <h5 class="card-title">{{entry.title}}</h5>-->
-<!--    <p class="card-text">{{entry.summary[3:200]}}</p>-->
-<!--    <a href="{{entry.link}}" class="btn btn-primary">Read more</a>-->
-<!--  </div>-->
-<!--</div>-->
-<!--  </div>-->
-<!--		  </div>-->
-<!--	  </div>-->
-<!--	     </div>-->
-<!-- </div>-->
-
-<!--{% endfor %}-->
+	  </div>
+</div>
+</div>
+</div>
 </body>
 {% endblock %}
 
