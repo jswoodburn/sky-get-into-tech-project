@@ -1,30 +1,13 @@
-# Python standard libraries
-import json
 import os
-import sqlite3
-
-# Third party libraries
-from flask import Flask, redirect, request, url_for
+from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import (
-    LoginManager,
-    current_user,
-    login_required,
-    login_user,
-    logout_user,
-)
+from flask_login import (LoginManager)
 from oauthlib.oauth2 import WebApplicationClient
 import requests
 
-# instantiate Flask object (app)
 
 app = Flask(__name__)
-# app.secret_key = 'skyGIT'
 app.secret_key = os.environ.get("SECRET_KEY") or os.urandom(24)
-
-
-
-# make sure the username, password and database name are correct
 
 username = 'newuser'
 password = 'password'
@@ -32,24 +15,20 @@ userpass = 'mysql+pymysql://' + username + ':' + password + '@'
 server = '127.0.0.1'
 dbname = '/db'
 
-# put them all together as a string that shows SQLAlchemy where the database is
 app.config['SQLALCHEMY_DATABASE_URI'] = userpass + server + dbname
 app.config['SQLALCHEMY_DATABASE_URI'] = "mysql+pymysql://newuser:password@localhost/db"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-# app.config['SECRET_KEY'] = getenv('FLASK_SECRETKEY')
 
-# Linking app to the persistence layer
 db = SQLAlchemy(app)
-
 
 from application import routes
 
 
 # ----------- GOOGLE AUTH ---------------
-
 GOOGLE_CLIENT_ID = "1078137073918-2ur6jb9jsihmd95uohhp2hq6qkegnmoa.apps.googleusercontent.com"
 GOOGLE_CLIENT_SECRET = "yEGN03m9WSjLAGkK2azEvqof"
 GOOGLE_DISCOVERY_URL = "https://accounts.google.com/.well-known/openid-configuration"
+
 
 # User session management setup
 # https://flask-login.readthedocs.io/en/latest

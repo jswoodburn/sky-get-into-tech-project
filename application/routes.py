@@ -1,28 +1,18 @@
-from flask import render_template, request, url_for, make_response
-from flask_login import current_user
 from google.auth.transport import requests
-from application.__init__ import get_google_provider_cfg, client, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, login_manager
 import json
-from datetime import datetime
-
-import requests
 from flask import render_template, request, url_for
-from flask_login import current_user, login_required, logout_user, login_user, login_manager, user_logged_in
+from flask_login import current_user, login_required, logout_user, login_user
 import requests
 from sqlalchemy import exists, desc
-from sqlalchemy.sql.expression import func, select
+from sqlalchemy.sql.expression import func
 from werkzeug.utils import redirect
-
 from application import app, db
 from application.__init__ import get_google_provider_cfg, client, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
 from application.forms.journalform import JournalForm
-
 from application.models import User, Journal, JournalTheme
 from datetime import datetime
 import tweepy
-from feedgen.feed import FeedGenerator
 import feedparser
-
 from application.exceptions.PageNotFound import PageNotFoundError
 from application.exceptions.RequiresLogin import PageRequiresLoginError
 from application.exceptions.PageDeletedError import PageDeletedError
@@ -33,12 +23,13 @@ from application.exceptions.UserPermissionsDenied import PermissionsDeniedError
 @app.route('/home')
 def home():
     if current_user.is_authenticated:
-        first_name = db.session.query(User).get(id)
         return render_template('homepage.html', title='Home', is_logged_in=True,
-                               first_name=f"{current_user.first_name}", user_journal_index=url_for("user_journal_list", user_id=current_user.id))
+                               first_name=f"{current_user.first_name}",
+                               user_journal_index=url_for("user_journal_list", user_id=current_user.id))
 
     else:
-        return render_template('homepage.html', title='Home', is_logged_in=False, user_journal_index=url_for("page_requires_login", err="journal-index-requires-login"))
+        return render_template('homepage.html', title='Home', is_logged_in=False,
+                               user_journal_index=url_for("page_requires_login", err="journal-index-requires-login"))
 
 
 @app.route('/login', methods=["POST", "GET"])
@@ -98,7 +89,6 @@ def callback():
     if userinfo_response.json().get("email_verified"):
         google_uid = userinfo_response.json()["sub"]
         users_email = userinfo_response.json()["email"]
-        picture = userinfo_response.json()["picture"]
         users_name = userinfo_response.json()["given_name"]
     else:
         return "User email not available or not verified by Google.", 400
@@ -135,22 +125,22 @@ def logout():
 def mindfulness():
     if current_user.is_authenticated:
         return render_template('mindfulness.html', title='Mindfulness', is_logged_in=True,
-                               first_name=f"{current_user.first_name}", user_journal_index=url_for("user_journal_list", user_id=current_user.id))
+                               first_name=f"{current_user.first_name}",
+                               user_journal_index=url_for("user_journal_list", user_id=current_user.id))
     else:
-        return render_template('mindfulness.html', title='Mindfulness', is_logged_in=False, user_journal_index=url_for("page_requires_login", err="journal-index-requires-login"))
+        return render_template('mindfulness.html', title='Mindfulness', is_logged_in=False,
+                               user_journal_index=url_for("page_requires_login", err="journal-index-requires-login"))
 
 
 rss_url = 'https://www.goodnewsnetwork.org/category/news/feed/'
 
 
-@app.route('/impactfulmedia')
+@app.route('/impactful-media')
 def impactful_media():
     auth = tweepy.OAuthHandler("VXNAakrOK2uorxArIJGWWLYlC", "ND4xneY9OboE4kQJe2IhhUwZdHb1qh366HiWVcGkCAAs9UghLv")
     auth.set_access_token("1355474665972621316-dWfZkdGO6xLSpSDIn2khGc4V2l5j0Y",
                           "sSnf7RrNQDVY2SBE5H5sO4qN0LJ7wscwGdmF6SizpG2XW")
     api = tweepy.API(auth)
-
-    search = request.args.get('q')
 
     date_since = "2021-03-03"
 
@@ -160,22 +150,22 @@ def impactful_media():
                            since=date_since,
                            result_type="popular").items(20)
 
-    techtweets = tweepy.Cursor(api.search,
-                               q="#techforgood",
-                               lang="en",
-                               since=date_since,
-                               ).items(20)
+    tech_tweets = tweepy.Cursor(api.search,
+                                q="#techforgood",
+                                lang="en",
+                                since=date_since,
+                                ).items(20)
 
     feed = feedparser.parse("https://www.goodnewsnetwork.org/category/news/feed/")
     entry = feed.entries
 
     if current_user.is_authenticated:
-        return render_template('impactfulmedia.html', title='Mindfulness', is_logged_in=True, feed=feed,
-                               first_name=f"{current_user.first_name}", tweets=tweets, techtweets=techtweets,
+        return render_template('impactful_media.html', title='Mindfulness', is_logged_in=True, feed=feed,
+                               first_name=f"{current_user.first_name}", tweets=tweets, techtweets=tech_tweets,
                                entry=entry)
     else:
-        return render_template('impactfulmedia.html', title='Mindfulness', is_logged_in=False, feed=feed,
-                               entry=entry, tweets=tweets, techtweets=techtweets)
+        return render_template('impactful_media.html', title='Mindfulness', is_logged_in=False, feed=feed,
+                               entry=entry, tweets=tweets, techtweets=tech_tweets)
 
 
 @app.route('/journal', methods=['GET', 'POST'])
@@ -186,7 +176,6 @@ def create_journal():
         title = form.title.data
         entry = form.entry.data
         author_id = current_user.id
-        author = current_user.first_name
 
         if len(title) == 0 or len(entry) == 0:
             error = "Please supply a title and entry."
@@ -198,9 +187,9 @@ def create_journal():
             journal_id = journal_submission.journal_id
             return redirect(url_for('specific_journal_page', journal_id=journal_id, user_id=author_id))
     if current_user.is_authenticated:
-        randomtheme = db.session.query(JournalTheme.theme).order_by(func.rand()).first()
+        random_theme = db.session.query(JournalTheme.theme).order_by(func.rand()).first()
         return render_template('create_journal_entry.html', form=form, message=error, is_logged_in=True,
-                               randomtheme=randomtheme[0], is_edit=False, delete_form="")
+                               randomtheme=random_theme[0], is_edit=False, delete_form="")
     else:
         raise PageRequiresLoginError("User tried to access journal creation page without logging in.")
 
@@ -259,7 +248,6 @@ def edit_journal(user_id, journal_id):
     error = ""
 
     journal_to_edit = db.session.query(Journal).get(journal_id)
-    author = db.session.query(User).get(journal_to_edit.author_id)
     journal_form = JournalForm()
 
     if request.method == "POST":
@@ -330,15 +318,16 @@ def profile():
         raise PageRequiresLoginError("Anonymous user tried to access profile page.")
 
 
-@app.route('/aboutus')
-def aboutus():
+@app.route('/about_us')
+def about_us():
     if current_user.is_authenticated:
-        first_name = db.session.query(User).get(id)
-        return render_template('aboutus.html', title='About Us', is_logged_in=True,
-                               first_name=f"{current_user.first_name}", user_journal_index=url_for("user_journal_list", user_id=current_user.id))
+        return render_template('about_us.html', title='About Us', is_logged_in=True,
+                               first_name=f"{current_user.first_name}",
+                               user_journal_index=url_for("user_journal_list", user_id=current_user.id))
 
     else:
-        return render_template('aboutus.html', title='About Us', is_logged_in=False, user_journal_index=url_for("page_requires_login", err="journal-index-requires-login"))
+        return render_template('about_us.html', title='About Us', is_logged_in=False,
+                               user_journal_index=url_for("page_requires_login", err="journal-index-requires-login"))
 
 
 @app.route('/search/<search_input>')
@@ -358,11 +347,11 @@ def search_results(search_input):
         author = db.session.query(User).get(post.author_id)
         author_index_page = url_for('user_journal_list', user_id=post.author_id)
         search_result_list.append({"title": post.title,
-                               "journal_url": url,
-                               "date": post.date_created,
-                               "preview": shortened_entry,
-                               "name": author.first_name,
-                               "author_url": author_index_page})
+                                   "journal_url": url,
+                                   "date": post.date_created,
+                                   "preview": shortened_entry,
+                                   "name": author.first_name,
+                                   "author_url": author_index_page})
     no_results = False
     if len(search_result_list) == 0:
         no_results = True
