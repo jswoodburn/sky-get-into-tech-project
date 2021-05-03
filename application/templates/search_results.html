@@ -1,0 +1,24 @@
+{% extends "layout.html" %} {% block body_content %}
+  <h2>Search for "{{search_input}}"</h2>
+  {% if no_results %}
+    <div>
+      <h5>Sorry, there were no results for your search.</h5>
+    </div>
+  {% else %}
+    <div class="list-group">
+      {% for result in search_results %}
+      <div class="list-group-item list-group-item">
+        <div class="d-flex w-100 justify-content-between">
+          <h5 class="mb-1"><a class="text-dark" href={{result.journal_url}}>{{result.title}}</a></h5>
+          <small class="">{{result.date}}</small>
+        </div>
+        <div class="d-flex justify-content-between">
+          <small class="text-muted">{{result.preview}}</small>
+          <small class="text-muted">by <a class="text-secondary" href={{result.author_url}}>{{result.name}}</a></small>
+        </div>
+
+      </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endblock %}
