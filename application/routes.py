@@ -17,6 +17,7 @@ from werkzeug.utils import redirect
 from application import app, db
 from application.__init__ import get_google_provider_cfg, client, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
 from application.forms.journalform import JournalForm
+from application.forms.deletejournalform import DeleteJournalForm
 from application.models import User, Journal, JournalTheme
 from datetime import datetime
 import tweepy
@@ -181,7 +182,7 @@ def create_journal():
     if current_user.is_authenticated:
         randomtheme = db.session.query(JournalTheme.theme).order_by(func.rand()).first()
         return render_template('create_journal_entry.html', form=form, message=error, is_logged_in=True,
-                               randomtheme=randomtheme[0], is_edit=False, delete_url="")
+                               randomtheme=randomtheme[0], is_edit=False, delete_form="")
     else:
         raise PageRequiresLoginError("User tried to access journal creation page without logging in.")
 
@@ -220,13 +221,8 @@ def specific_journal_page(user_id, journal_id):
         time = str(journal_entry.time_created)[:5]
         can_edit = False
         if current_user.is_authenticated:
-            print(current_user.id, user_id)
-
             if int(current_user.id) == int(user_id):
                 can_edit = True
-
-        print(can_edit)
-
         return render_template('journal_entry.html', title=journal_entry.title, entry=journal_entry.entry,
                                date=journal_entry.date_created, time=time, author=f"{user.first_name}",
                                index_url=f"/journal/{user_id}", is_logged_in=True, can_edit=can_edit,
@@ -240,11 +236,12 @@ def edit_journal(user_id, journal_id):
 
     journal_to_edit = db.session.query(Journal).get(journal_id)
     author = db.session.query(User).get(journal_to_edit.author_id)
-    form = JournalForm()
+    journal_form = JournalForm()
+    delete_form = DeleteJournalForm()
 
-    if request.method == "POST":
-        title = form.title.data
-        entry = form.entry.data
+    if request.method == "POST" and journal_form.submit:
+        title = journal_form.title.data
+        entry = journal_form.entry.data
 
         if len(title) == 0 or len(entry) == 0:
             error = "Please supply a title and entry"
@@ -256,6 +253,19 @@ def edit_journal(user_id, journal_id):
             journal_id = journal_to_edit.journal_id
             author_id = journal_to_edit.author_id
             return redirect(url_for('specific_journal_page', user_id=author_id, journal_id=journal_id))
+    elif request.method == "POST" and delete_form.submit:
+        if current_user.is_authenticated:
+            if int(user_id) != int(current_user.id):
+                raise PermissionsDeniedError(f"User with ID {current_user.id} tried to delete entry "
+                                             f"{journal_id} by user with ID {user_id}.")
+            else:
+                journal_to_delete = db.session.query(Journal).get(journal_id)
+                journal_to_delete.deleted = True
+                db.session.add(journal_to_delete)
+                db.session.commit()
+                return redirect(url_for('user_journal_list', user_id=user_id))
+        else:
+            raise PageRequiresLoginError("User tried to access journal deletion without logging in.")
 
     if not journal_to_edit:
         raise PageNotFoundError(f"The user has tried to access journal ID {journal_id} which does not exist in the "
@@ -270,28 +280,29 @@ def edit_journal(user_id, journal_id):
             raise PermissionsDeniedError(f"User with ID {current_user.id} tried to access edit page for entry "
                                          f"{journal_id} by user with ID {user_id}")
         else:
-            form.title.data = journal_to_edit.title
-            form.entry.data = journal_to_edit.entry
-            return render_template('create_journal_entry.html', form=form, message=error, is_logged_in=True,
-                                   randomtheme="", is_edit=True, delete_url=f"/journal/{user_id}-{journal_id}-delete")
+            journal_form.title.data = journal_to_edit.title
+            journal_form.entry.data = journal_to_edit.entry
+            return render_template('create_journal_entry.html', form=journal_form, message=error, is_logged_in=True,
+                                   randomtheme="", is_edit=True, delete_form=delete_form)
     else:
         raise PageRequiresLoginError("User tried to access journal edit page without logging in.")
 
 
-@app.route('/journal/<user_id>-<journal_id>-delete', methods=["POST"])
-def delete_journal(user_id, journal_id):
-    if current_user.is_authenticated:
-        if int(user_id) != int(current_user.id):
-            raise PermissionsDeniedError(f"User with ID {current_user.id} tried to delete entry "
-                                         f"{journal_id} by user with ID {user_id}.")
-        else:
-            journal_to_delete = db.session.query(Journal).get(journal_id)
-            journal_to_delete.deleted = True
-            db.session.add(journal_to_delete)
-            db.session.commit()
-            return redirect(url_for('user_journal_list', user_id=user_id))
-    else:
-        raise PageRequiresLoginError("User tried to access journal deletion without logging in.")
+# @app.route('/journal/<user_id>-<journal_id>-delete', methods=["POST"])
+# def delete_journal(user_id, journal_id):
+    # if current_user.is_authenticated:
+    #     if int(user_id) != int(current_user.id):
+    #         raise PermissionsDeniedError(f"User with ID {current_user.id} tried to delete entry "
+    #                                      f"{journal_id} by user with ID {user_id}.")
+    #     else:
+    #         journal_to_delete = db.session.query(Journal).get(journal_id)
+    #         journal_to_delete.deleted = True
+    #         db.session.add(journal_to_delete)
+    #         db.session.commit()
+    #         return redirect(url_for('user_journal_list', user_id=user_id))
+    # else:
+    #     raise PageRequiresLoginError("User tried to access journal deletion without logging in.")
+
 
 
 @app.route('/profile', methods=['GET', 'POST'])
