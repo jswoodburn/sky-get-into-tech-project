@@ -43,9 +43,7 @@
 
                 <div class="dropdown-menu" aria-labelledby="journalDropdown">
                     <a class="dropdown-item" href="/journal">Create</a>
-<!--                    ADD IN JOURNAL LINKS HERE FOR EDIT AND READ BELOW-->
-                    <a class="dropdown-item" href="#">Edit</a>
-                    <a class="dropdown-item" href="#">Read</a>
+                    <a class="dropdown-item" href={{user_journal_index}}>Read</a>
                 </div>
 
            <li class="nav-item">
@@ -80,7 +78,7 @@
   {% block body_content %}{% endblock %}
 
 <!--Sticky footer with social media links-->
-  <footer class="footer Rasa mt-auto py-3 justify-content-center" style="background: #DBBEA1;" >
+  <footer class="footer Rasa mt-auto py-3 justify-content-center" style="background: #DBBEA1; position: fixed-bottom" >
   <div class="container">
 
     <span class>

@@ -8,7 +8,6 @@ from datetime import datetime
 import requests
 from flask import render_template, request, url_for
 from flask_login import current_user, login_required, logout_user, login_user, login_manager, user_logged_in
-# from google.auth.transport import requests
 import requests
 from sqlalchemy import exists, desc
 from sqlalchemy.sql.expression import func, select
@@ -28,8 +27,6 @@ from application.exceptions.RequiresLogin import PageRequiresLoginError
 from application.exceptions.PageDeletedError import PageDeletedError
 from application.exceptions.UserPermissionsDenied import PermissionsDeniedError
 
-# import flask_whooshalchemy as wa
-# wa.whoosh_index(app, Journal)
 
 @app.route('/')
 @app.route('/home')
@@ -37,10 +34,10 @@ def home():
     if current_user.is_authenticated:
         first_name = db.session.query(User).get(id)
         return render_template('homepage.html', title='Home', is_logged_in=True,
-                               first_name=f"{current_user.first_name}")
+                               first_name=f"{current_user.first_name}", user_journal_index=url_for("user_journal_list", user_id=current_user.id))
 
     else:
-        return render_template('homepage.html', title='Home', is_logged_in=False)
+        return render_template('homepage.html', title='Home', is_logged_in=False, user_journal_index=url_for("page_requires_login", err="journal-index-requires-login"))
 
 
 @app.route('/login', methods=["POST", "GET"])
@@ -137,9 +134,9 @@ def logout():
 def mindfulness():
     if current_user.is_authenticated:
         return render_template('mindfulness.html', title='Mindfulness', is_logged_in=True,
-                               first_name=f"{current_user.first_name}")
+                               first_name=f"{current_user.first_name}", user_journal_index=url_for("user_journal_list", user_id=current_user.id))
     else:
-        return render_template('mindfulness.html', title='Mindfulness', is_logged_in=False)
+        return render_template('mindfulness.html', title='Mindfulness', is_logged_in=False, user_journal_index=url_for("page_requires_login", err="journal-index-requires-login"))
 
 
 rss_url = 'https://www.goodnewsnetwork.org/category/news/feed/'
@@ -154,35 +151,30 @@ def impactful_media():
 
     search = request.args.get('q')
 
-    public_tweets = api.user_timeline(search)
-    # Define the search term and the date_since date as variables
-    search_words = "#positivity"
     date_since = "2021-03-03"
-    tweets = tweepy.Cursor(api.search,
-                           q=search_words,
-                           lang="en",
-                           since=date_since).items(5)
 
     tweets = tweepy.Cursor(api.search,
-                           q=search_words,
+                           q="#positivity",
                            lang="en",
-                           since=date_since).items(20)
+                           since=date_since,
+                           result_type="popular").items(20)
+
+    techtweets = tweepy.Cursor(api.search,
+                               q="#techforgood",
+                               lang="en",
+                               since=date_since,
+                               ).items(20)
 
     feed = feedparser.parse("https://www.goodnewsnetwork.org/category/news/feed/")
     entry = feed.entries
-    # title = entry.title
-    # published = entry.published
-    # summary = entry.summary
-    # link = entry.link
-    # image = entry.media_content[0]['url']
 
     if current_user.is_authenticated:
         return render_template('impactfulmedia.html', title='Mindfulness', is_logged_in=True, feed=feed,
-                               first_name=f"{current_user.first_name}", tweets=tweets,
+                               first_name=f"{current_user.first_name}", tweets=tweets, techtweets=techtweets,
                                entry=entry)
     else:
         return render_template('impactfulmedia.html', title='Mindfulness', is_logged_in=False, feed=feed,
-                               entry=entry, tweets=tweets)
+                               entry=entry, tweets=tweets, techtweets=techtweets)
 
 
 @app.route('/journal', methods=['GET', 'POST'])
@@ -258,7 +250,6 @@ def specific_journal_page(user_id, journal_id):
 
 @app.route('/journal/<user_id>-<journal_id>-edit', methods=["GET", "POST"])
 def edit_journal(user_id, journal_id):
-
     error = ""
 
     journal_to_edit = db.session.query(Journal).get(journal_id)
@@ -318,7 +309,6 @@ def delete_journal(user_id, journal_id):
         raise PageRequiresLoginError("User tried to access journal deletion without logging in.")
 
 
-
 @app.route('/profile', methods=['GET', 'POST'])
 @login_required
 def profile():
@@ -335,16 +325,15 @@ def profile():
         raise PageRequiresLoginError("Anonymous user tried to access profile page.")
 
 
-
 @app.route('/aboutus')
 def aboutus():
     if current_user.is_authenticated:
         first_name = db.session.query(User).get(id)
         return render_template('aboutus.html', title='About Us', is_logged_in=True,
-                               first_name=f"{current_user.first_name}")
+                               first_name=f"{current_user.first_name}", user_journal_index=url_for("user_journal_list", user_id=current_user.id))
 
     else:
-        return render_template('aboutus.html', title='About Us', is_logged_in=False)
+        return render_template('aboutus.html', title='About Us', is_logged_in=False, user_journal_index=url_for("page_requires_login", err="journal-index-requires-login"))
 
 
 @app.route('/search/<search_input>')
@@ -388,14 +377,13 @@ def page_does_not_exist(err):
                            sub_message="Please check the URL and try again.", is_logged_in=False)
 
 
-
 @app.errorhandler(401)  # unauthorised error - generated by @login_required
 @app.errorhandler(PageRequiresLoginError)
+@app.route("/permissions-error_<err>")
 def page_requires_login(err):
     app.logger.exception(err)
     return render_template('generic_exception_page.html', message="You must log in to access this page.",
                            sub_message="", is_logged_in=False)
-
 
 
 @app.errorhandler(PageDeletedError)
@@ -405,18 +393,18 @@ def page_deleted(err):
                            sub_message="", is_logged_in=False)
 
 
-
 @app.errorhandler(PermissionsDeniedError)
 def page_deleted(err):
     app.logger.exception(err)
     return render_template('generic_exception_page.html', message="You do not have permission to access this page.",
-    sub_message="You must be logged in as the owner of this page to access it.", is_logged_in=False)
+                           sub_message="You must be logged in as the owner of this page to access it.",
+                           is_logged_in=False)
 
 
-@app.errorhandler(500) # server error
-@app.errorhandler(Exception) # catch all for any other errors
+@app.errorhandler(500)  # server error
+@app.errorhandler(Exception)  # catch all for any other errors
 def something_wrong(err):
     app.logger.exception(err)
     return render_template('generic_exception_page.html', message="Oops, something has gone wrong.",
-                           sub_message="Please try refreshing the page or come back later. Our engineers are hard at work to fix the "
-                                       "problem.", is_logged_in=False)
+                           sub_message="Please try refreshing the page or come back later. Our engineers are hard at "
+                                       "work to fix the problem.", is_logged_in=False)
