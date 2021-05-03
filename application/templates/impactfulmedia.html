@@ -10,22 +10,20 @@
 {% else %}
 <p>Please log in to track your engagement</p>
 {% endif %}
-<body>
-<div class="card-group container">
+
+<div class="card-group">
 	<div class="row">
 	{% for entry in feed.entries %}
-  <div class="card col-sm">
+  <div class="card col-sm-4">
     <img class="card-img-top  col-sm" src="{{entry.media_content[0]['url']}}"
 		 alt="Card image cap" style="max-width: 100%">
-    <div class="card-body col-sm">
-      <h5 class="card-title col-sm">{{entry.title}}</h5>
-      <p class="card-text col-sm">{{entry.summary[3:300]}}...</p>
+    <div class="card-body">
+      <h5 class="card-title">{{entry.title}}</h5>
+      <p class="card-text">{{entry.summary[3:300]}}...</p>
       <a href="{{entry.link}}" onclick="trackClick()" class="btn btn-secondary card-text col-sm">Read more</a>
     </div>
   </div>
-</div>
 	  {% endfor %}
-  </div>
 </div>
 <h3 id="tweets"> Positive Tweets</h3>
 <div class="row">
