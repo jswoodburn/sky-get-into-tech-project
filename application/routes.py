@@ -17,7 +17,6 @@ from werkzeug.utils import redirect
 from application import app, db
 from application.__init__ import get_google_provider_cfg, client, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
 from application.forms.journalform import JournalForm
-from application.forms.deletejournalform import DeleteJournalForm
 from application.models import User, Journal, JournalTheme
 from datetime import datetime
 import tweepy
@@ -28,6 +27,9 @@ from application.exceptions.PageNotFound import PageNotFoundError
 from application.exceptions.RequiresLogin import PageRequiresLoginError
 from application.exceptions.PageDeletedError import PageDeletedError
 from application.exceptions.UserPermissionsDenied import PermissionsDeniedError
+
+# import flask_whooshalchemy as wa
+# wa.whoosh_index(app, Journal)
 
 @app.route('/')
 @app.route('/home')
@@ -41,7 +43,7 @@ def home():
         return render_template('homepage.html', title='Home', is_logged_in=False)
 
 
-@app.route('/login')
+@app.route('/login', methods=["POST", "GET"])
 def login():
     # Find out what URL to hit for Google login
     google_provider_cfg = get_google_provider_cfg()
@@ -347,35 +349,35 @@ def aboutus():
 
 @app.route('/search/<search_input>')
 def search_results(search_input):
-        search_with_spaces = " ".join(search_input.split("-"))
-        search_sql = f"%{search_with_spaces}%"
-        posts = db.session.query(Journal).filter(Journal.title.like(search_sql)).filter_by(
-            deleted=False).order_by(desc(Journal.date_created)).order_by(desc(Journal.time_created))
+    search_with_spaces = " ".join(search_input.split("-"))
+    search_sql = f"%{search_with_spaces}%"
+    posts = db.session.query(Journal).filter(Journal.title.like(search_sql)).filter_by(
+        deleted=False).order_by(desc(Journal.date_created)).order_by(desc(Journal.time_created))
 
-        search_result_list = []
-        for post in posts:
-            url = url_for('specific_journal_page', user_id=post.author_id, journal_id=post.journal_id)
-            if len(post.entry) > 50:
-                shortened_entry = post.entry[:50] + "..."
-            else:
-                shortened_entry = post.entry
-            author = db.session.query(User).get(post.author_id)
-            author_index_page = url_for('user_journal_list', user_id=post.author_id)
-            search_result_list.append({"title": post.title,
-                                   "journal_url": url,
-                                   "date": post.date_created,
-                                   "preview": shortened_entry,
-                                   "name": author.first_name,
-                                   "author_url": author_index_page})
-        no_results = False
-        if len(search_result_list) == 0:
-            no_results = True
-        if current_user.is_authenticated:
-            return render_template('search_results.html', search_input=search_with_spaces,
-                                   search_results=search_result_list, is_logged_in=True, no_results=no_results)
+    search_result_list = []
+    for post in posts:
+        url = url_for('specific_journal_page', user_id=post.author_id, journal_id=post.journal_id)
+        if len(post.entry) > 50:
+            shortened_entry = post.entry[:50] + "..."
         else:
-            return render_template('search_results.html', search_input=search_with_spaces,
-                                   search_results=search_result_list, is_logged_in=False, no_results=no_results)
+            shortened_entry = post.entry
+        author = db.session.query(User).get(post.author_id)
+        author_index_page = url_for('user_journal_list', user_id=post.author_id)
+        search_result_list.append({"title": post.title,
+                               "journal_url": url,
+                               "date": post.date_created,
+                               "preview": shortened_entry,
+                               "name": author.first_name,
+                               "author_url": author_index_page})
+    no_results = False
+    if len(search_result_list) == 0:
+        no_results = True
+    if current_user.is_authenticated:
+        return render_template('search_results.html', search_input=search_with_spaces,
+                               search_results=search_result_list, is_logged_in=True, no_results=no_results)
+    else:
+        return render_template('search_results.html', search_input=search_with_spaces,
+                               search_results=search_result_list, is_logged_in=False, no_results=no_results)
 
 
 @app.errorhandler(404)

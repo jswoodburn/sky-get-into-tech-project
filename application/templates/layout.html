@@ -9,6 +9,12 @@
     <link rel="stylesheet" href="../static/styles/style.css">
     <script src="../static/js/mindful.js"></script>
     <title>Digital Health</title>
+    <script>
+        function SearchTermSlug() {
+          const str = document.getElementById("searchQuery").value
+          document.getElementById("searchForm").action = "/search/" + str.replace(/\s+/g, '-').toLowerCase();
+        }
+    </script>
 </head>
 
 <body class="d-flex flex-column h-100">
@@ -60,9 +66,11 @@
           </li>
           {% endif %}
         </ul>
-        <form class="form-inline my-2 my-lg-0">
-          <input class="form-control mr-sm-2" type="search" placeholder="Search Journal Titles" aria-label="Search">
-          <button class="btn btn-dark my-2 my-sm-0" type="submit">Go</button>
+        <form id="searchForm" class="form-inline my-2 my-lg-0" onsubmit="SearchTermSlug()" method="GET">
+          <div class="form-group">
+            <input class="form-control mr-sm-2" type="search" placeholder="Search Journal Titles" aria-label="Search" id="searchQuery">
+            <button class="btn btn-dark my-2 my-sm-0" type="submit">Go</button>
+          </div>
         </form>
       </div>
     </nav>
