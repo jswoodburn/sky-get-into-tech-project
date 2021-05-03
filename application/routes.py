@@ -16,6 +16,7 @@ from werkzeug.utils import redirect
 from application import app, db
 from application.__init__ import get_google_provider_cfg, client, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
 from application.forms.journalform import JournalForm
+
 from application.models import User, Journal, JournalTheme
 from datetime import datetime
 import tweepy
@@ -255,7 +256,6 @@ def edit_journal(user_id, journal_id):
     journal_to_edit = db.session.query(Journal).get(journal_id)
     author = db.session.query(User).get(journal_to_edit.author_id)
     journal_form = JournalForm()
-    delete_form = DeleteJournalForm()
 
     if request.method == "POST":
         title = journal_form.title.data
@@ -287,7 +287,7 @@ def edit_journal(user_id, journal_id):
             journal_form.title.data = journal_to_edit.title
             journal_form.entry.data = journal_to_edit.entry
             return render_template('create_journal_entry.html', form=journal_form, message=error, is_logged_in=True,
-                                   randomtheme="", is_edit=True, delete_form=delete_form,
+                                   randomtheme="", is_edit=True,
                                    journal_id=journal_to_edit.journal_id, user_id=journal_to_edit.author_id)
     else:
         raise PageRequiresLoginError("User tried to access journal edit page without logging in.")

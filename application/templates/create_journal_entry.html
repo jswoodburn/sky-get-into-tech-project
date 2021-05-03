@@ -23,27 +23,23 @@ function ConfirmDelete() {
   </div>
 </div>
 
-<input class="form-group">
+<div class="form-group">
+  {% if not is_edit %}
+    <h5>Here is a prompt for your journaling today: <strong>{{randomtheme}}</strong></h5>
+  {% endif %}
   <form action="" method="POST">
      <div class="d-flex flex-column align-items-center p-2 px-md-6 mb-2 bg-white border-bottom shadow-sm">
-    {% if is_logged_in %}
-
-    {% endif %}
-
-    {{ form.hidden_tag() }} {{ form.title.label }}
-
-       {{ form.title }}
-
-    <br />
-    {{ form.entry.label }} {{ form.entry }}
-
-    <br />
-    {{ form.submit }} {{ message }}
+       {{ form.hidden_tag() }}
+       {{ form.title.label }} {{ form.title }}
+       <br />
+       {{ form.entry.label }} {{ form.entry }}
+       <br />
+       {{ form.submit }} {{ message }}
   </form>
   {% if is_edit %}
     <button type="button" class="btn btn-dark" onclick={ConfirmDelete()}>Delete</button>
   {% endif %}
-</div>
+  </div>
 </div>
 {% endblock %}
 
