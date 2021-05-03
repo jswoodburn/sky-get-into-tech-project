@@ -40,6 +40,20 @@
   </div>
 	{% endfor %}
 </div>
+
+<h3>Positive Tech Tweets</h3>
+<div class="row">
+	{% for tweet in techtweets %}
+  <div class="col-sm-6">
+    <div class="card">
+      <div class="card-body">
+        <p class="card-text">{{ tweet._json.text }}</p>
+        <a href="{{ tweet._json.text[-23:] }}" class="btn btn-primary">View on Twitter</a>
+      </div>
+    </div>
+  </div>
+	{% endfor %}
+</div>
 <!--<div class="">-->
 <!--<div class="card-group container">-->
 <!--	<div class="row">-->
