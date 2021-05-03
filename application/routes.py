@@ -239,7 +239,7 @@ def edit_journal(user_id, journal_id):
     journal_form = JournalForm()
     delete_form = DeleteJournalForm()
 
-    if request.method == "POST" and journal_form.submit:
+    if request.method == "POST":
         title = journal_form.title.data
         entry = journal_form.entry.data
 
@@ -253,20 +253,19 @@ def edit_journal(user_id, journal_id):
             journal_id = journal_to_edit.journal_id
             author_id = journal_to_edit.author_id
             return redirect(url_for('specific_journal_page', user_id=author_id, journal_id=journal_id))
-    elif request.method == "POST" and delete_form.submit:
-        if current_user.is_authenticated:
-            if int(user_id) != int(current_user.id):
-                raise PermissionsDeniedError(f"User with ID {current_user.id} tried to delete entry "
-                                             f"{journal_id} by user with ID {user_id}.")
-            else:
-                journal_to_delete = db.session.query(Journal).get(journal_id)
-                journal_to_delete.deleted = True
-                db.session.add(journal_to_delete)
-                db.session.commit()
-                return redirect(url_for('user_journal_list', user_id=user_id))
-        else:
-            raise PageRequiresLoginError("User tried to access journal deletion without logging in.")
-
+    # elif request.method == "POST" and delete_form.submit:
+    #     if current_user.is_authenticated:
+    #         if int(user_id) != int(current_user.id):
+    #             raise PermissionsDeniedError(f"User with ID {current_user.id} tried to delete entry "
+    #                                          f"{journal_id} by user with ID {user_id}.")
+    #         else:
+    #             journal_to_delete = db.session.query(Journal).get(journal_id)
+    #             journal_to_delete.deleted = True
+    #             db.session.add(journal_to_delete)
+    #             db.session.commit()
+    #             return redirect(url_for('user_journal_list', user_id=user_id))
+    #     else:
+    #         raise PageRequiresLoginError("User tried to access journal deletion without logging in.")
     if not journal_to_edit:
         raise PageNotFoundError(f"The user has tried to access journal ID {journal_id} which does not exist in the "
                                 f"database.")
@@ -283,25 +282,26 @@ def edit_journal(user_id, journal_id):
             journal_form.title.data = journal_to_edit.title
             journal_form.entry.data = journal_to_edit.entry
             return render_template('create_journal_entry.html', form=journal_form, message=error, is_logged_in=True,
-                                   randomtheme="", is_edit=True, delete_form=delete_form)
+                                   randomtheme="", is_edit=True, delete_form=delete_form,
+                                   journal_id=journal_to_edit.journal_id, user_id=journal_to_edit.author_id)
     else:
         raise PageRequiresLoginError("User tried to access journal edit page without logging in.")
 
 
-# @app.route('/journal/<user_id>-<journal_id>-delete', methods=["POST"])
-# def delete_journal(user_id, journal_id):
-#     if current_user.is_authenticated:
-#         if int(user_id) != int(current_user.id):
-#             raise PermissionsDeniedError(f"User with ID {current_user.id} tried to delete entry "
-#                                          f"{journal_id} by user with ID {user_id}.")
-#         else:
-#             journal_to_delete = db.session.query(Journal).get(journal_id)
-#             journal_to_delete.deleted = True
-#             db.session.add(journal_to_delete)
-#             db.session.commit()
-#             return redirect(url_for('user_journal_list', user_id=user_id))
-#     else:
-#         raise PageRequiresLoginError("User tried to access journal deletion without logging in.")
+@app.route('/journal/<user_id>-<journal_id>-delete', methods=["POST"])
+def delete_journal(user_id, journal_id):
+    if current_user.is_authenticated:
+        if int(user_id) != int(current_user.id):
+            raise PermissionsDeniedError(f"User with ID {current_user.id} tried to delete entry "
+                                         f"{journal_id} by user with ID {user_id}.")
+        else:
+            journal_to_delete = db.session.query(Journal).get(journal_id)
+            journal_to_delete.deleted = True
+            db.session.add(journal_to_delete)
+            db.session.commit()
+            return redirect(url_for('user_journal_list', user_id=user_id))
+    else:
+        raise PageRequiresLoginError("User tried to access journal deletion without logging in.")
 
 
 
