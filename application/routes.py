@@ -214,6 +214,8 @@ def create_journal():
 def user_journal_list(user_id):
     author_entries = db.session.query(Journal.journal_id).filter_by(author_id=user_id).filter_by(
         deleted=False).order_by(desc(Journal.date_created)).order_by(desc(Journal.time_created))
+    author = db.session.query(User).get(user_id)
+    author_name = author.first_name
     journal_data = []
     for journal_entry in author_entries:
         journal_id = journal_entry[0]
@@ -224,7 +226,7 @@ def user_journal_list(user_id):
         else:
             shortened_entry = entry.entry
         journal_data.append([entry.title, url, entry.date_created, shortened_entry])
-    return render_template('user_journals_list.html', title="Your Journal Entries", title_list=journal_data,
+    return render_template('user_journals_list.html', title=f"{author_name}'s Journals", title_list=journal_data,
                            is_logged_in=True)
 
 
@@ -325,7 +327,8 @@ def profile():
             entry_word_string = journal_entry.entry
             words += len(entry_word_string.split())
         return render_template('profile.html', first_name=f"{current_user.first_name}", is_logged_in=True,
-                               words_journaled=words)
+                               words_journaled=words, journal_index_url=url_for("user_journal_list",
+                                                                                user_id=current_user.id))
     else:
         raise PageRequiresLoginError("Anonymous user tried to access profile page.")
 
