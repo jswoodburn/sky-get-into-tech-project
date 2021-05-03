@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, TextAreaField, TextField
 from wtforms.validators import DataRequired, length
-from flask_bootstrap import Bootstrap
+# from flask_bootstrap import Bootstrap
 
 class JournalForm(FlaskForm):
     title = StringField('Title')

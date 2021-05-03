@@ -48,10 +48,10 @@ def home():
     if current_user.is_authenticated:
         first_name = db.session.query(User).get(id)
         return render_template('homepage.html', title='Home', is_logged_in=True,
-                               first_name=f"{current_user.first_name}")
+                               first_name=f"{current_user.first_name}", user_journal_index=url_for("user_journal_list", user_id=current_user.id))
 
     else:
-        return render_template('homepage.html', title='Home', is_logged_in=False)
+        return render_template('homepage.html', title='Home', is_logged_in=False, user_journal_index=url_for("page_requires_login", err="journal-index-requires-login"))
 
 
 @app.route('/login')
@@ -149,9 +149,9 @@ def mindfulness():
 
     if current_user.is_authenticated:
         return render_template('mindfulness.html', title='Mindfulness', is_logged_in=True,
-                               first_name=f"{current_user.first_name}")
+                               first_name=f"{current_user.first_name}", user_journal_index=url_for("user_journal_list", user_id=current_user.id))
     else:
-        return render_template('mindfulness.html', title='Mindfulness', is_logged_in=False)
+        return render_template('mindfulness.html', title='Mindfulness', is_logged_in=False, user_journal_index=url_for("page_requires_login", err="journal-index-requires-login"))
 
 
 FEED_URL = 'https://www.goodnewsnetwork.org/category/news/feed/'
@@ -181,9 +181,9 @@ def impactful_media():
                            since=date_since).items(20)
     if current_user.is_authenticated:
         return render_template('impactfulmedia.html', title='Mindfulness', is_logged_in=True,
-                               first_name=f"{current_user.first_name}", tweets=tweets)
+                               first_name=f"{current_user.first_name}", tweets=tweets, user_journal_index=url_for("user_journal_list", user_id=current_user.id))
     else:
-        return render_template('impactfulmedia.html', title='Mindfulness', is_logged_in=False)
+        return render_template('impactfulmedia.html', title='Mindfulness', is_logged_in=False, user_journal_index=url_for("page_requires_login", err="journal-index-requires-login"))
 
 
 @app.route('/journal', methods=['GET', 'POST'])
@@ -210,10 +210,10 @@ def create_journal():
     if current_user.is_authenticated:
         randomtheme = db.session.query(JournalTheme.theme).order_by(func.rand()).first()
         return render_template('create_journal_entry.html', form=form, message=error, is_logged_in=True,
-                               randomtheme=randomtheme[0])
+                               randomtheme=randomtheme[0], user_journal_index=url_for("user_journal_list", user_id=current_user.id))
         # return render_template('journalv2.html', form=form, message=error)
     else:
-        return render_template('create_journal_entry.html', form=form, message=error, is_logged_in=False)
+        return render_template('create_journal_entry.html', form=form, message=error, is_logged_in=False, user_journal_index=url_for("page_requires_login", err="journal-index-requires-login"))
 
 
 @app.route('/journal/<user_id>')
@@ -301,10 +301,10 @@ def aboutus():
     if current_user.is_authenticated:
         first_name = db.session.query(User).get(id)
         return render_template('aboutus.html', title='About Us', is_logged_in=True,
-                               first_name=f"{current_user.first_name}")
+                               first_name=f"{current_user.first_name}", user_journal_index=url_for("user_journal_list", user_id=current_user.id))
 
     else:
-        return render_template('aboutus.html', title='About Us', is_logged_in=False)
+        return render_template('aboutus.html', title='About Us', is_logged_in=False, user_journal_index=url_for("page_requires_login", err="journal-index-requires-login"))
 
 @app.errorhandler(404)
 @app.errorhandler(PageNotFoundError)
@@ -314,6 +314,7 @@ def page_does_not_exist(err):
     sub_message="Please check the URL and try again.", is_logged_in=False)
 
 @app.errorhandler(PageRequiresLoginError)
+@app.route("/permissions-error_<err>")
 def page_requires_login(err):
     app.logger.exception(err)
     return render_template('generic_exception_page.html', message="You must log in to access this page.",
@@ -332,3 +333,6 @@ def something_wrong(err):
     return render_template('generic_exception_page.html', message="Oops, something has gone wrong.",
     sub_message="Please try refreshing the page or come back later. Our engineers are hard at work to fix the "
                 "problem.", is_logged_in=False)
+
+
+
