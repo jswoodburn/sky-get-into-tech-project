@@ -22,7 +22,6 @@ from application.models import User, Journal, JournalTheme
 from datetime import datetime
 import tweepy
 from feedgen.feed import FeedGenerator
-from newscatcher import Newscatcher
 import feedparser
 
 from application.exceptions.PageNotFound import PageNotFoundError
