@@ -5,8 +5,26 @@
 	<title>Impactful Media</title>
 	<link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css">
 </head>
-
+{% if is_logged_in %}
+<p> A feed of some good news for you, {{first_name}}, followed by a feed of positive tweets</p>
+{% else %}
+<p>Please log in to track your engagement</p>
+{% endif %}
 <body>
+
+	{% for entry in feed.entries %}
+	<div class="card-deck">
+  <div class="card">
+    <img class="card-img-top img-thumbnail" src="{{entry.media_content[0]['url']}}" alt="Card image cap">
+    <div class="card-body">
+      <h5 class="card-title">{{entry.title}}</h5>
+      <p class="card-text">{{entry.summary[3:350]}}...</p>
+      <a href="{{entry.link}}" class="btn btn-primary">Read more</a>
+    </div>
+  </div>
+	  {% endfor %}
+  </div>
+
 	  {% for tweet in tweets %}
 	  <div class="card mt-2">
 	    <div class="card-body">
@@ -16,9 +34,26 @@
             </div>
 	  </div>
 	  {% endfor %}
-       </div>
-   </div>
- </div>
+	  <div>
+
+<!--{% for entry in feed.entries %}-->
+<!--		  <div class="row">-->
+<!--  <div class="col-sm-6">-->
+<!--		  <div class="card" style="width: 18rem;">-->
+<!--  <img class="card-img-top" src="{{entry.media_content[0]['url']}}" alt="good news image">-->
+<!--  <div class="card-body">-->
+<!--    <h5 class="card-title">{{entry.title}}</h5>-->
+<!--    <p class="card-text">{{entry.summary[3:200]}}</p>-->
+<!--    <a href="{{entry.link}}" class="btn btn-primary">Read more</a>-->
+<!--  </div>-->
+<!--</div>-->
+<!--  </div>-->
+<!--		  </div>-->
+<!--	  </div>-->
+<!--	     </div>-->
+<!-- </div>-->
+
+<!--{% endfor %}-->
 </body>
 {% endblock %}
 
