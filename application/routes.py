@@ -206,6 +206,7 @@ def create_journal():
 
 
 @app.route('/journal/<user_id>')
+@login_required
 def user_journal_list(user_id):
     author_entries = db.session.query(Journal.journal_id).filter_by(author_id=user_id).filter_by(
         deleted=False).order_by(desc(Journal.date_created)).order_by(desc(Journal.time_created))
@@ -226,6 +227,7 @@ def user_journal_list(user_id):
 
 
 @app.route('/journal/<user_id>-<journal_id>')
+@login_required
 def specific_journal_page(user_id, journal_id):
     journal_entry = db.session.query(Journal).get(journal_id)
     user = db.session.query(User).get(user_id)
