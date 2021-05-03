@@ -8,8 +8,3 @@ class JournalForm(FlaskForm):
     entry = TextAreaField('Journal Entry (3000 characters)')
     submit = SubmitField("Post entry")
 
-
-# class JournalForm(FlaskForm):
-#     title = StringField('Title')
-#     entry = StringField('Journal Entry')
-#     submit = SubmitField("Post entry")
