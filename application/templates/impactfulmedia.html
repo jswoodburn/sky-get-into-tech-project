@@ -16,7 +16,7 @@
 	{% for entry in feed.entries %}
   <div class="card col-sm">
     <img class="card-img-top  col-sm" src="{{entry.media_content[0]['url']}}"
-		 alt="Card image cap">
+		 alt="Card image cap" style="max-width: 100%">
     <div class="card-body col-sm">
       <h5 class="card-title col-sm">{{entry.title}}</h5>
       <p class="card-text col-sm">{{entry.summary[3:300]}}...</p>
@@ -27,25 +27,38 @@
 	  {% endfor %}
   </div>
 </div>
-
-<div class="card-group container">
-	<div class="row">
-<div class="card-deck">
-	  {% for tweet in tweets %}
-	  <div class="card mt-2">
-	    <div class="card-body">
-	      <div class="card-text">
-		  {{ tweet._json.text }}
-	      </div>
-            </div>
-	  </div>
-	  {% endfor %}
-	  <div>
-	  </div>
+<div class="row">
+	{% for tweet in tweets %}
+  <div class="col-sm-6">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Special title treatment</h5>
+        <p class="card-text">{{ tweet._json.text }}</p>
+        <a href="{{ tweet._json.text[-23:] }}" class="btn btn-primary">View Tweet on Twitter</a>
+      </div>
+    </div>
+  </div>
+	{% endfor %}
 </div>
-</div>
-</div>
-</body>
+<!--<div class="">-->
+<!--<div class="card-group container">-->
+<!--	<div class="row">-->
+<!--<div class="card-deck">-->
+<!--	  {% for tweet in tweets %}-->
+<!--	  <div class="card mt-2">-->
+<!--	    <div class="card-body">-->
+<!--	      <div class="card-text">-->
+<!--		  {{ tweet._json.text }}-->
+<!--	      </div>-->
+<!--            </div>-->
+<!--	  </div>-->
+<!--	  {% endfor %}-->
+<!--	  <div>-->
+<!--	  </div>-->
+<!--</div>-->
+<!--</div>-->
+<!--</div>-->
+<!--</body>-->
 {% endblock %}
 
 

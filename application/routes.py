@@ -165,8 +165,10 @@ def impactful_media():
     tweets = tweepy.Cursor(api.search,
                            q=search_words,
                            lang="en",
-                           since=date_since).items(20)
-
+                           since=date_since,
+                           result_type="popular").items(20)
+    # twittername = tweets.screen_name
+    # tweeturl = tweets.urls[0]['url']
     feed = feedparser.parse("https://www.goodnewsnetwork.org/category/news/feed/")
     entry = feed.entries
     # title = entry.title
