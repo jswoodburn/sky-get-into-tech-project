@@ -1,14 +1,18 @@
 {% extends "layout.html" %} {% block body_content %}
 <h2>{{title}}</h2>
-<div class="list-group">
-  {% for item in title_list %}
-  <a href="{{item[1]}}" class="list-group-item list-group-item-action">
-    <div class="d-flex w-100 justify-content-between">
-      <h5 class="mb-1">{{item[0]}}</h5>
-      <small>{{item[2]}}</small>
-    </div>
-    <small class="text-muted">{{item[3]}}</small>
-  </a>
-  {% endfor %}
-</div>
+{% if no_journals %}
+  <h5>This user has not written any journals yet!</h5>
+{% else %}
+  <div class="list-group">
+    {% for item in title_list %}
+    <a href="{{item[1]}}" class="list-group-item list-group-item-action">
+      <div class="d-flex w-100 justify-content-between">
+        <h5 class="mb-1">{{item[0]}}</h5>
+        <small>{{item[2]}}</small>
+      </div>
+      <small class="text-muted">{{item[3]}}</small>
+    </a>
+    {% endfor %}
+  </div>
+{% endif %}
 {% endblock %}

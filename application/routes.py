@@ -222,8 +222,11 @@ def user_journal_list(user_id):
         else:
             shortened_entry = entry.entry
         journal_data.append([entry.title, url, entry.date_created, shortened_entry])
+    no_journals = False
+    if len(journal_data) == 0:
+        no_journals = True
     return render_template('user_journals_list.html', title=f"{author_name}'s Journals", title_list=journal_data,
-                           is_logged_in=True)
+                           is_logged_in=True, no_journals=no_journals)
 
 
 @app.route('/journal/<user_id>-<journal_id>')
