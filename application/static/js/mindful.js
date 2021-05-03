@@ -21,7 +21,9 @@ function trackTime() {
     }
 
 }
+function trackClick(){
 
+}
 function toggleAudio() {
   var audio = document.getElementById('audio');
         if (audio.paused) {

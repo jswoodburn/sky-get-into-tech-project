@@ -20,7 +20,7 @@
     <div class="card-body col-sm">
       <h5 class="card-title col-sm">{{entry.title}}</h5>
       <p class="card-text col-sm">{{entry.summary[3:300]}}...</p>
-      <a href="{{entry.link}}" class="btn btn-primary card-text col-sm">Read more</a>
+      <a href="{{entry.link}}" onclick="trackClick()" class="btn btn-secondary card-text col-sm">Read more</a>
     </div>
   </div>
 </div>
