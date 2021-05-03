@@ -21,8 +21,9 @@ from application.forms.deletejournalform import DeleteJournalForm
 from application.models import User, Journal, JournalTheme
 from datetime import datetime
 import tweepy
-from feedgen.feed import FeedGenerator
-import feedparser
+# from feedgen.feed import FeedGenerator
+# from newscatcher import Newscatcher
+# import feedparser
 
 from application.exceptions.PageNotFound import PageNotFoundError
 from application.exceptions.RequiresLogin import PageRequiresLoginError
@@ -133,6 +134,19 @@ def logout():
 
 @app.route('/mindfulness')
 def mindfulness():
+
+    if current_user.is_authenticated:
+        return render_template('mindfulness.html', title='Mindfulness', is_logged_in=True,
+                               first_name=f"{current_user.first_name}")
+    else:
+        return render_template('mindfulness.html', title='Mindfulness', is_logged_in=False)
+
+
+FEED_URL = 'https://www.goodnewsnetwork.org/category/news/feed/'
+
+
+@app.route('/impactfulmedia')
+def impactful_media():
     auth = tweepy.OAuthHandler("VXNAakrOK2uorxArIJGWWLYlC", "ND4xneY9OboE4kQJe2IhhUwZdHb1qh366HiWVcGkCAAs9UghLv")
     auth.set_access_token("1355474665972621316-dWfZkdGO6xLSpSDIn2khGc4V2l5j0Y",
                           "sSnf7RrNQDVY2SBE5H5sO4qN0LJ7wscwGdmF6SizpG2XW")
@@ -152,12 +166,12 @@ def mindfulness():
     tweets = tweepy.Cursor(api.search,
                            q=search_words,
                            lang="en",
-                           since=date_since).items(5)
+                           since=date_since).items(20)
     if current_user.is_authenticated:
-        return render_template('mindfulness.html', title='Mindfulness', is_logged_in=True,
+        return render_template('impactfulmedia.html', title='Mindfulness', is_logged_in=True,
                                first_name=f"{current_user.first_name}", tweets=tweets)
     else:
-        return render_template('mindfulness.html', title='Mindfulness', is_logged_in=False)
+        return render_template('impactfulmedia.html', title='Mindfulness', is_logged_in=False)
 
 
 @app.route('/journal', methods=['GET', 'POST'])

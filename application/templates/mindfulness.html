@@ -1,34 +1,50 @@
-{% extends "layout.html" %} {% block body_content %}
+{% extends "layout.html" %}
+{% block body_content %}
 {% if is_logged_in %}
-    <p>Take the time to be mindful, {{first_name}}</p>
-{% else %}
-<p>Take the time to be mindful</p>
-{% endif %}
-<head>
-	<title>Mindfulness</title>
-	<link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css">
-</head>
-<body>
+    <p>Take the time to be mindful, {{first_name}}.</p>
+</br>
+<p>Below are some mindfulness activities for you to follow along to. Press one of the below buttons to
+	 get start a visual breathing exercise or a guided body scan meditation.</p>
 <div class="container">
- <div class="row justify-content-center">
-   <div class="col-md-6">
-     <div class="p-5">
-       <form class="form-inline" method="GET" action="{{ url_for('mindfulness') }}">
-	 <input class="form-control" type="text" name="q">
-	 <button class="btn btn-primary" type="submit">search</button>
-       </form>
-     </div>
-	  {% for tweet in tweets %}
-	  <div class="card mt-2">
-	    <div class="card-body">
-	      <div class="card-text">
-		  {{ tweet._json.text }}
-	      </div>
-            </div>
-	  </div>
-	  {% endfor %}
-       </div>
-   </div>
- </div>
-</body>
+  <div class="row">
+    <div class="col">
+      	<button type="button" class="btn btn-secondary" onclick="togglePicture(); trackTime();">Start Mindful Breathing</button>
+
+
+<img style="display:none;" id="breathing" src="../static/breathing.gif" width="480px" height="480px"/>
+    </div>
+    <div class="col">
+      <button class="btn btn-secondary" onclick="toggleAudio()">Play Guided Body Scan</button>
+<audio id="audio" src="https://palousemindfulness.com/disks/bodyscan20min.mp3"></audio>
+				<audio src="https://palousemindfulness.com/disks/bodyscan20min.mp3" id="audio"></audio>
+<i class="glyphicon glyphicon-play-circle b-play" id="play" onclick="play()"></i>
+    </div>
+  </div>
+  </div>
+</div>
+<!--&lt;!&ndash;GIF&ndash;&gt;-->
+<!--<div class="row justify-content-center">-->
+<!--	<button type="button" class="btn btn-secondary" onclick="togglePicture(); trackTime();">Start Mindful Breathing</button>-->
+<!--	<div id="mindfulimg">-->
+
+<!--<img style="display:none;" id="breathing" src="../static/breathing.gif" width="480px" height="480px"/>-->
+<!--	</div>-->
+<!--</div>-->
+<!--		<div class="row justify-content-center">-->
+<!--			<div class="col-sm-4">-->
+<!--&lt;!&ndash;	Audio&ndash;&gt;-->
+
+<!--<button class="btn btn-secondary" onclick="toggleAudio()">Play Guided Body Scan</button>-->
+<!--<audio id="audio" src="https://palousemindfulness.com/disks/bodyscan20min.mp3"></audio>-->
+<!--				<audio src="https://palousemindfulness.com/disks/bodyscan20min.mp3" id="audio"></audio>-->
+<!--<i class="glyphicon glyphicon-play-circle b-play" id="play" onclick="play()"></i>-->
+<!--			</div>-->
+<!--		</div>-->
+{% else %}
+<p>Take the time to be Mindful. Please login to access the visual and audio mindfulness activities. </p>
+
+
+
+{% endif %}
+
 {% endblock %}
