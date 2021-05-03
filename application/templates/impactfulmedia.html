@@ -5,8 +5,32 @@
 	<title>Impactful Media</title>
 	<link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css">
 </head>
-
+{% if is_logged_in %}
+<p> A feed of some good news for you, {{first_name}}, followed by a feed of positive tweets</p>
+{% else %}
+<p>Please log in to track your engagement</p>
+{% endif %}
 <body>
+<div class="card-group container">
+	<div class="row">
+	{% for entry in feed.entries %}
+  <div class="card col-sm">
+    <img class="card-img-top  col-sm" src="{{entry.media_content[0]['url']}}"
+		 alt="Card image cap">
+    <div class="card-body col-sm">
+      <h5 class="card-title col-sm">{{entry.title}}</h5>
+      <p class="card-text col-sm">{{entry.summary[3:300]}}...</p>
+      <a href="{{entry.link}}" onclick="trackClick()" class="btn btn-secondary card-text col-sm">Read more</a>
+    </div>
+  </div>
+</div>
+	  {% endfor %}
+  </div>
+</div>
+
+<div class="card-group container">
+	<div class="row">
+<div class="card-deck">
 	  {% for tweet in tweets %}
 	  <div class="card mt-2">
 	    <div class="card-body">
@@ -16,9 +40,11 @@
             </div>
 	  </div>
 	  {% endfor %}
-       </div>
-   </div>
- </div>
+	  <div>
+	  </div>
+</div>
+</div>
+</div>
 </body>
 {% endblock %}
 
