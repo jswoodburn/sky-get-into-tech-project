@@ -28,8 +28,6 @@ function ConfirmDelete() {
      <div class="d-flex flex-column align-items-center p-2 px-md-6 mb-2 bg-white border-bottom shadow-sm">
     {% if is_logged_in %}
 
-    <p>Journal Theme: {{randomtheme}}</p>
-    <p class="label">A prompt to help you with your next journal entry</p>
     {% endif %}
 
     {{ form.hidden_tag() }} {{ form.title.label }}
