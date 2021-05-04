@@ -35,10 +35,12 @@ def home():
     if current_user.is_authenticated:
         first_name = db.session.query(User).get(id)
         return render_template('homepage.html', title='Home', is_logged_in=True,
-                               first_name=f"{current_user.first_name}", user_journal_index=url_for("user_journal_list", user_id=current_user.id))
+                               first_name=f"{current_user.first_name}",
+                               user_journal_index=url_for("user_journal_list", user_id=current_user.id))
 
     else:
-        return render_template('homepage.html', title='Home', is_logged_in=False, user_journal_index=url_for("page_requires_login", err="journal-index-requires-login"))
+        return render_template('homepage.html', title='Home', is_logged_in=False,
+                               user_journal_index=url_for("page_requires_login", err="journal-index-requires-login"))
 
 
 @app.route('/login', methods=["POST", "GET"])
@@ -62,12 +64,9 @@ def callback():
     # Get authorization code Google sent back to you
     code = request.args.get("code")
 
-    # Find out what URL to hit to get tokens that allow you to ask for
-    # things on behalf of a user
     google_provider_cfg = get_google_provider_cfg()
     token_endpoint = google_provider_cfg["token_endpoint"]
 
-    # Prepare and send a request to get tokens! Yay tokens!
     token_url, headers, body = client.prepare_token_request(
         token_endpoint,
         authorization_response=request.url,
@@ -82,34 +81,23 @@ def callback():
         auth=(GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET),
     )
 
-    # Parse the tokens!
     client.parse_request_body_response(json.dumps(token_response.json()))
 
-    # Now that you have tokens. let's find and hit the URL
-    # from Google that gives you the user's profile information,
-    # including their Google profile image and email
     userinfo_endpoint = google_provider_cfg["userinfo_endpoint"]
     uri, headers, body = client.add_token(userinfo_endpoint)
     userinfo_response = requests.get(uri, headers=headers, data=body)
 
-    # You want to make sure their email is verified.
-    # The user authenticated with Google, authorized your
-    # app, and now you've verified their email through Google!
     if userinfo_response.json().get("email_verified"):
         google_uid = userinfo_response.json()["sub"]
         users_email = userinfo_response.json()["email"]
-        picture = userinfo_response.json()["picture"]
         users_name = userinfo_response.json()["given_name"]
     else:
         return "User email not available or not verified by Google.", 400
 
-    # print(db.session.query(User.id).filter_by(google_id=google_uid))
     user = User(
-        google_id=google_uid, first_name=users_name, email=users_email
-    )
+        google_id=google_uid, first_name=users_name, email=users_email)
 
     # If user does not exist in db, create and add them to it
-    # if not db.session.query(User.id).filter_by(google_id=google_uid):
     if not db.session.query(exists().where(User.google_id == google_uid)).scalar():
         db.session.add(user)
         db.session.commit()
@@ -135,9 +123,11 @@ def logout():
 def mindfulness():
     if current_user.is_authenticated:
         return render_template('mindfulness.html', title='Mindfulness', is_logged_in=True,
-                               first_name=f"{current_user.first_name}", user_journal_index=url_for("user_journal_list", user_id=current_user.id))
+                               first_name=f"{current_user.first_name}",
+                               user_journal_index=url_for("user_journal_list", user_id=current_user.id))
     else:
-        return render_template('mindfulness.html', title='Mindfulness', is_logged_in=False, user_journal_index=url_for("page_requires_login", err="journal-index-requires-login"))
+        return render_template('mindfulness.html', title='Mindfulness', is_logged_in=False,
+                               user_journal_index=url_for("page_requires_login", err="journal-index-requires-login"))
 
 
 rss_url = 'https://www.goodnewsnetwork.org/category/news/feed/'
@@ -149,8 +139,6 @@ def impactful_media():
     auth.set_access_token("1355474665972621316-dWfZkdGO6xLSpSDIn2khGc4V2l5j0Y",
                           "sSnf7RrNQDVY2SBE5H5sO4qN0LJ7wscwGdmF6SizpG2XW")
     api = tweepy.API(auth)
-
-    search = request.args.get('q')
 
     date_since = "2021-03-03"
 
@@ -335,10 +323,12 @@ def aboutus():
     if current_user.is_authenticated:
         first_name = db.session.query(User).get(id)
         return render_template('aboutus.html', title='About Us', is_logged_in=True,
-                               first_name=f"{current_user.first_name}", user_journal_index=url_for("user_journal_list", user_id=current_user.id))
+                               first_name=f"{current_user.first_name}",
+                               user_journal_index=url_for("user_journal_list", user_id=current_user.id))
 
     else:
-        return render_template('aboutus.html', title='About Us', is_logged_in=False, user_journal_index=url_for("page_requires_login", err="journal-index-requires-login"))
+        return render_template('aboutus.html', title='About Us', is_logged_in=False,
+                               user_journal_index=url_for("page_requires_login", err="journal-index-requires-login"))
 
 
 @app.route('/search/<search_input>')
@@ -358,11 +348,11 @@ def search_results(search_input):
         author = db.session.query(User).get(post.author_id)
         author_index_page = url_for('user_journal_list', user_id=post.author_id)
         search_result_list.append({"title": post.title,
-                               "journal_url": url,
-                               "date": post.date_created,
-                               "preview": shortened_entry,
-                               "name": author.first_name,
-                               "author_url": author_index_page})
+                                   "journal_url": url,
+                                   "date": post.date_created,
+                                   "preview": shortened_entry,
+                                   "name": author.first_name,
+                                   "author_url": author_index_page})
     no_results = False
     if len(search_result_list) == 0:
         no_results = True
