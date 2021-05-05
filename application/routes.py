@@ -148,18 +148,18 @@ def impactful_media():
                            since=date_since,
                            result_type="popular").items(20)
 
-    techtweets = tweepy.Cursor(api.search,
-                               q="#techforgood",
-                               lang="en",
-                               since=date_since,
-                               ).items(20)
+    tech_tweets = tweepy.Cursor(api.search,
+                                q="#techforgood",
+                                lang="en",
+                                since=date_since,
+                                ).items(20)
 
     feed = feedparser.parse("https://www.goodnewsnetwork.org/category/news/feed/")
     entry = feed.entries
 
     if current_user.is_authenticated:
         return render_template('impactfulmedia.html', title='Mindfulness', is_logged_in=True, feed=feed,
-                               first_name=f"{current_user.first_name}", tweets=tweets, techtweets=techtweets,
+                               first_name=f"{current_user.first_name}", tweets=tweets, techtweets=tech_tweets,
                                entry=entry)
     else:
         return render_template('impactfulmedia.html', title='Mindfulness', is_logged_in=False, feed=feed,
@@ -186,9 +186,9 @@ def create_journal():
             journal_id = journal_submission.journal_id
             return redirect(url_for('specific_journal_page', journal_id=journal_id, user_id=author_id))
     if current_user.is_authenticated:
-        randomtheme = db.session.query(JournalTheme.theme).order_by(func.rand()).first()
+        random_theme = db.session.query(JournalTheme.theme).order_by(func.rand()).first()
         return render_template('create_journal_entry.html', form=form, message=error, is_logged_in=True,
-                               randomtheme=randomtheme[0], is_edit=False, delete_form="")
+                               randomtheme=random_theme[0], is_edit=False, delete_form="")
     else:
         raise PageRequiresLoginError("User tried to access journal creation page without logging in.")
 
