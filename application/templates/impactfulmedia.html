@@ -19,7 +19,7 @@
 		 alt="Card image cap" style="max-width: 100%">
     <div class="card-body">
       <h5 class="card-title">{{entry.title}}</h5>
-      <p class="card-text">{{entry.summary[3:300]}}...</p>
+      <p class="card-text">{{entry.summary[:349]|safe}}...</p>
       <a href="{{entry.link}}" onclick="trackClick()" class="btn btn-secondary card-text col-sm">Read more</a>
     </div>
   </div>
